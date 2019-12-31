@@ -8,7 +8,7 @@ Given a corpus of news stories:
 * Can we put identified geographic features into context?
 * Where are stories located on maps?
 * How are stories distributed by geographic features?
-* Are there reasonable correlations between the geography of news stories and other boundaries?
+* Are there reasonable correlations between the geographies of news stories and other boundaries?
   * Census Tracts
   * Zip Codes
   * School Zones
