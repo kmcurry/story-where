@@ -1,5 +1,7 @@
-# This script walks a directory of XML files looking for newspaper articles.
-# Found articles are copied another directory.
+# TLA 1.b.i
+# "If filename ends in .xml and has classifier tag with value attribute set to article, 
+# move file to ~/articles/../filename.xml"
+
 import xml.etree.ElementTree as ET
 import os
 from shutil import copyfile
