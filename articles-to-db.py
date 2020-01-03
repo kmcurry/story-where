@@ -1,4 +1,4 @@
-# TLA 1.a.i
+# TLA 2.a
 # Extract text from DOM Paths and write to database
 
 import os
