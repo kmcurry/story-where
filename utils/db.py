@@ -1,3 +1,4 @@
+import io
 import os
 from datetime import datetime, date
 from sqlalchemy import (create_engine, Boolean, Column,
@@ -26,8 +27,8 @@ class Article(Base):
     __tablename__ = 'articles'
     id = Column(Integer, primary_key=True)
     filepath = Column(String)
-    docId = Column(String)
-    releaseDate = Column(DateTime)
+    doc_id = Column(String)
+    release_date = Column(DateTime)
     classifier = Column(String)
     location = Column(String)
     headline = Column(Text)
@@ -89,7 +90,7 @@ class Database():
     def disconnect(self):
         self.session.close()
     
-    def add_article(self, article):
+    def add_single_article(self, article):
         sections = article['sections']
         keywords = article['keywords']
 
@@ -106,3 +107,13 @@ class Database():
 
         self.session.add(article_entity)
         self.session.commit()
+
+    def copy_from_file(self, table_name, filename, header):
+        with open(filename, 'r') as f:
+            cols = None
+            if header:
+                cols = f.readline().split('\t')
+            connection = self.engine.raw_connection()
+            cursor = connection.cursor()
+            cursor.copy_from(f, table_name, columns=cols)
+            connection.commit()
