@@ -38,6 +38,7 @@ class Article(Base):
     abstract = Column(Text)
     body = Column(Text)
     tagline = Column(String)
+    nlp_date = Column(DateTime)
     sections = relationship(
         "Section",
         secondary=articles_sections_assoc_table,
@@ -46,6 +47,9 @@ class Article(Base):
         "Keyword",
         secondary=articles_keywords_assoc_table,
         back_populates="articles")
+    nl_entities = relationship(
+        "NLEntity", 
+        back_populates="article")
 
 class Section(Base):
     __tablename__ = 'sections'
@@ -64,6 +68,19 @@ class Keyword(Base):
         "Article",
         secondary=articles_keywords_assoc_table,
         back_populates="keywords")
+
+class NLEntity(Base):
+    __tablename__ = 'nlentities'
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    type = Column(String)
+    wiki = Column(String)
+    salience = Column(Float)
+    proper = Column(Boolean)
+    article_id = Column(Integer, ForeignKey('articles.id'))
+    article = relationship(
+        "Article", 
+        back_populates="nl_entities")
 
 #
 # Database class
