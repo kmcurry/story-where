@@ -134,3 +134,10 @@ class Database():
             cursor = connection.cursor()
             cursor.copy_from(f, table_name, columns=cols)
             connection.commit()
+
+    def get_articles_to_nlp(self, count):
+        return self.session \
+            .query(Article) \
+            .filter(Article.nlp_date == None) \
+            .limit(count) \
+            .all()
