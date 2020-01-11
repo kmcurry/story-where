@@ -151,7 +151,7 @@ for root, dirs, files in os.walk('.\\articles'):
             if 'type' in pd.attrib and pd.attrib['type'] == 'web':
                 has_section = True
                 section = pd.attrib['position.section']
-                # hardcoded news section?            vvv
+                # hardcoded news section, just trying things
                 if section == 'print_only/tabs_your_town_calendar': print(path)
                 if section not in sections_count:
                     sections_count[section] = 0
