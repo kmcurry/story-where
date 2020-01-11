@@ -107,6 +107,10 @@ class Database():
     def disconnect(self):
         self.session.close()
     
+    def clear_nl_entities(self):
+        self.session.query(NLEntity).delete()
+        self.session.commit()
+    
     def add_single_article(self, article):
         sections = article['sections']
         keywords = article['keywords']
@@ -140,4 +144,9 @@ class Database():
             .query(Article) \
             .filter(Article.nlp_date == None) \
             .limit(count) \
+            .all()
+
+    def get_article_doc_ids(self):
+        return self.session \
+            .query(Article.id, Article.doc_id) \
             .all()
