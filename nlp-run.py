@@ -25,25 +25,22 @@ for article in articles:
     outfile = outfile.replace(".xml", ".json")
     print(outfile)
 
-    if not os.path.exists(outfile):
-        if not os.path.exists(os.path.dirname(outfile)):
-            os.makedirs(os.path.dirname(outfile))
-        print("Getting NL Results")
+    if os.path.exists(outfile):
+        print("Skipping because NLP results already exist")
+        continue
 
-        document = types.Document(
-            content=nlp_text,
-            language='en',
-            type=enums.Document.Type.PLAIN_TEXT)
-        
-        response = client.analyze_entities(
-            document=document,
-            encoding_type='UTF32')
-        
-        with open(outfile, 'w') as outfile:
-            outfile.write(MessageToJson(response, preserving_proto_field_name=True))
+    if not os.path.exists(os.path.dirname(outfile)):
+        os.makedirs(os.path.dirname(outfile))
+    print("Getting NL Results")
 
-    with open(outfile, 'r') as entities_file:
-        nlp_response = json.load(entities_file)
-        entities = nlp_response['entities']
-        for entity in entities:
-            print(entity)
+    document = types.Document(
+        content=nlp_text,
+        language='en',
+        type=enums.Document.Type.PLAIN_TEXT)
+    
+    response = client.analyze_entities(
+        document=document,
+        encoding_type='UTF32')
+    
+    with open(outfile, 'w') as outfile:
+        outfile.write(MessageToJson(response, preserving_proto_field_name=True))
