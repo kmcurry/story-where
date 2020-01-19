@@ -245,7 +245,7 @@ class WebDatabase():
         db_conn_str = os.environ['PG_CONN_STR']
         use_ssl = os.environ['PG_USE_SSL'] == 'true'
 
-        ssl_args = None
+        ssl_args = {}
         if use_ssl:
             ssl_args = { 
                 'sslmode': 'verify-ca',
