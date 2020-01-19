@@ -1,5 +1,6 @@
 articles/*
 nlp_results/*
+geocode_results/*
 *.csv
 
 # Byte-compiled / optimized / DLL files
@@ -131,3 +132,4 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+nlp_results.zip
