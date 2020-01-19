@@ -258,6 +258,18 @@ class WebDatabase():
         self.session = sessionmaker(bind=self.engine)()
     
     def get_article(self, article_id):
-        return self.session \
-            .query(Article) \
-            .get(article_id)
+        article_entity = self.session.query(Article).get(article_id)
+
+        article_schema = ArticleSchema()
+        article = article_schema.dump(article_entity)
+
+        sections_schema = SectionSchema(many=True, exclude=["articles"])
+        article['sections'] = sections_schema.dump(article_entity.sections)
+
+        keywords_schema = KeywordSchema(many=True, exclude=["articles"])
+        article['keywords'] = keywords_schema.dump(article_entity.keywords)
+
+        nl_entities_schema = NLEntitySchema(many=True, exclude=["articles"])
+        article['nlEntities'] = nl_entities_schema.dump(article_entity.nl_entities)
+
+        return article

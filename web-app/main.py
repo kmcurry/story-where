@@ -16,12 +16,14 @@ import datetime
 import os
 
 # [START gae_python37_auth_verify_token]
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect, url_for
 from google.auth.transport import requests
 from google.cloud import datastore
 import google.oauth2.id_token
 
-import db
+from db import WebDatabase
+
+db = WebDatabase()
 
 firebase_request_adapter = requests.Request()
 # [END gae_python37_auth_verify_token]
@@ -34,14 +36,33 @@ allowed_emails = [
     'ben.schoenfeld@gmail.com',
 ]
 
+@app.before_request
+def before_request():
+    if request.endpoint == 'index':
+        return
+
+    # Verify Firebase auth.
+    id_token = request.cookies.get("token")
+
+    if not id_token:
+        return jsonify({'error': "User not logged in"})
+
+    try:
+        claims = google.oauth2.id_token.verify_firebase_token(
+            id_token, firebase_request_adapter)
+        if claims['email'] not in allowed_emails:
+            return jsonify({'error': "User not allowed"})
+    except ValueError as exc:
+        error_message = str(exc)
+        return jsonify({'error': error_message}) 
+
 # [START gae_python37_auth_verify_token]
 @app.route('/')
-def root():
+def index():
     # Verify Firebase auth.
     id_token = request.cookies.get("token")
     error_message = None
     claims = None
-    times = None
 
     if id_token:
         try:
@@ -63,38 +84,8 @@ def root():
 # [END gae_python37_auth_verify_token]
 
 @app.route('/article/<int:article_id>')
-def get_article(article_id):
-    # Verify Firebase auth.
-    id_token = request.cookies.get("token")
-
-    if not id_token:
-        return jsonify({'error': "Not logged in"})
-
-    try:
-        claims = google.oauth2.id_token.verify_firebase_token(
-            id_token, firebase_request_adapter)
-        if claims['email'] not in allowed_emails:
-            return jsonify({'error': "User not allowed"})
-    except ValueError as exc:
-        error_message = str(exc)
-        return jsonify({'error': error_message})
-    
-    database = db.WebDatabase()
-    article_entity = database.get_article(article_id)
-
-    article_schema = db.ArticleSchema()
-    article = article_schema.dump(article_entity)
-
-    sections_schema = db.SectionSchema(many=True, exclude=["articles"])
-    article['sections'] = sections_schema.dump(article_entity.sections)
-
-    keywords_schema = db.KeywordSchema(many=True, exclude=["articles"])
-    article['keywords'] = keywords_schema.dump(article_entity.keywords)
-
-    nl_entities_schema = db.NLEntitySchema(many=True, exclude=["articles"])
-    article['nlEntities'] = nl_entities_schema.dump(article_entity.nl_entities)
-
-    return jsonify(article)
+def get_article(article_id): 
+    return jsonify(db.get_article(article_id))
 
 if __name__ == '__main__':
     # This is used when running locally only. When deploying to Google App
