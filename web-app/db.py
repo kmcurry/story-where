@@ -10,6 +10,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.pool import NullPool
 from pprint import pprint
+from marshmallow import Schema, fields
 
 Base = declarative_base()
 
@@ -51,6 +52,22 @@ class Article(Base):
         "NLEntity", 
         back_populates="article")
 
+class ArticleSchema(Schema):
+    id = fields.Int(dump_only=True)
+    filepath = fields.Str()
+    doc_id = fields.Str()
+    release_date = fields.DateTime()
+    classifier = fields.Str()
+    location = fields.Str()
+    headline = fields.Str()
+    byline = fields.Str()
+    publication = fields.Str()
+    author = fields.Str()
+    abstract = fields.Str()
+    body = fields.Str()
+    tagline = fields.Str()
+    nlp_date = fields.DateTime()
+
 class Section(Base):
     __tablename__ = 'sections'
     id = Column(Integer, primary_key=True)
@@ -60,6 +77,11 @@ class Section(Base):
         secondary=articles_sections_assoc_table,
         back_populates="sections")
 
+class SectionSchema(Schema):
+    id = fields.Int(dump_only=True)
+    name = fields.Str()
+    articles = fields.Nested(ArticleSchema)
+
 class Keyword(Base):
     __tablename__ = 'keywords'
     id = Column(Integer, primary_key=True)
@@ -68,6 +90,11 @@ class Keyword(Base):
         "Article",
         secondary=articles_keywords_assoc_table,
         back_populates="keywords")
+
+class KeywordSchema(Schema):
+    id = fields.Int(dump_only=True)
+    name = fields.Str()
+    articles = fields.Nested(ArticleSchema)
 
 class NLEntity(Base):
     __tablename__ = 'nlentities'
@@ -81,6 +108,15 @@ class NLEntity(Base):
     article = relationship(
         "Article", 
         back_populates="nl_entities")
+
+class NLEntitySchema(Schema):
+    id = fields.Int(dump_only=True)
+    name = fields.Str()
+    type = fields.Str()
+    wiki = fields.Str()
+    salience = fields.Float()
+    proper = fields.Bool()
+    articles = fields.Nested(ArticleSchema)
 
 class Location(Base):
     __tablename__ = 'locations'
@@ -207,10 +243,21 @@ class Database():
 class WebDatabase():
     def __init__(self):
         db_conn_str = os.environ['PG_CONN_STR']
-        self.engine = create_engine(db_conn_str)
+        use_ssl = os.environ['PG_USE_SSL'] == 'true'
+
+        ssl_args = None
+        if use_ssl:
+            ssl_args = { 
+                'sslmode': 'verify-ca',
+                'sslrootcert': os.environ['PG_SERVER_CA'],
+                'sslcert': os.environ['PG_CLIENT_CERT'],
+                'sslkey': os.environ['PG_CLIENT_KEY']
+            }
+
+        self.engine = create_engine(db_conn_str, connect_args=ssl_args)
         self.session = sessionmaker(bind=self.engine)()
     
-    def get_random_article(self):
+    def get_article(self, article_id):
         return self.session \
             .query(Article) \
-            .first()
+            .get(article_id)

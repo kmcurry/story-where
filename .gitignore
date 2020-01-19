@@ -133,3 +133,4 @@ dmypy.json
 # Pyre type checker
 .pyre/
 nlp_results.zip
+web-app/env_variables.yaml

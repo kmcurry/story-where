@@ -13,12 +13,15 @@
 # limitations under the License.
 
 import datetime
+import os
 
 # [START gae_python37_auth_verify_token]
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from google.auth.transport import requests
 from google.cloud import datastore
 import google.oauth2.id_token
+
+import db
 
 firebase_request_adapter = requests.Request()
 # [END gae_python37_auth_verify_token]
@@ -27,24 +30,9 @@ datastore_client = datastore.Client()
 
 app = Flask(__name__)
 
-
-def store_time(dt):
-    entity = datastore.Entity(key=datastore_client.key('visit'))
-    entity.update({
-        'timestamp': dt
-    })
-
-    datastore_client.put(entity)
-
-
-def fetch_times(limit):
-    query = datastore_client.query(kind='visit')
-    query.order = ['-timestamp']
-
-    times = query.fetch(limit=limit)
-
-    return times
-
+allowed_emails = [
+    'ben.schoenfeld@gmail.com',
+]
 
 # [START gae_python37_auth_verify_token]
 @app.route('/')
@@ -69,17 +57,44 @@ def root():
             # verification checks fail.
             error_message = str(exc)
 
-        # Record and fetch the recent times a logged-in user has accessed
-        # the site. This is currently shared amongst all users, but will be
-        # individualized in a following step.
-        store_time(datetime.datetime.now())
-        times = fetch_times(10)
-
     return render_template(
         'index.html',
-        user_data=claims, error_message=error_message, times=times)
+        user_data=claims, error_message=error_message)
 # [END gae_python37_auth_verify_token]
 
+@app.route('/article/<int:article_id>')
+def get_article(article_id):
+    # Verify Firebase auth.
+    id_token = request.cookies.get("token")
+
+    if not id_token:
+        return jsonify({'error': "Not logged in"})
+
+    try:
+        claims = google.oauth2.id_token.verify_firebase_token(
+            id_token, firebase_request_adapter)
+        if claims['email'] not in allowed_emails:
+            return jsonify({'error': "User not allowed"})
+    except ValueError as exc:
+        error_message = str(exc)
+        return jsonify({'error': error_message})
+    
+    database = db.WebDatabase()
+    article_entity = database.get_article(article_id)
+
+    article_schema = db.ArticleSchema()
+    article = article_schema.dump(article_entity)
+
+    sections_schema = db.SectionSchema(many=True, exclude=["articles"])
+    article['sections'] = sections_schema.dump(article_entity.sections)
+
+    keywords_schema = db.KeywordSchema(many=True, exclude=["articles"])
+    article['keywords'] = keywords_schema.dump(article_entity.keywords)
+
+    nl_entities_schema = db.NLEntitySchema(many=True, exclude=["articles"])
+    article['nlEntities'] = nl_entities_schema.dump(article_entity.nl_entities)
+
+    return jsonify(article)
 
 if __name__ == '__main__':
     # This is used when running locally only. When deploying to Google App
