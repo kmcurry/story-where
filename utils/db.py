@@ -94,7 +94,7 @@ class Location(Base):
     lat = Column(Float)
     lng = Column(Float)
 
-    has_bounds = Column(Float)
+    has_bounds = Column(Boolean)
     ne_lat = Column(Float)
     ne_lng = Column(Float)
     sw_lat = Column(Float)
