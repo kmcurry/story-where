@@ -34,6 +34,7 @@ app = Flask(__name__)
 
 allowed_emails = [
     'ben.schoenfeld@gmail.com',
+    'kmcurry@gmail.com',
 ]
 
 @app.before_request
