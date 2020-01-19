@@ -3,7 +3,7 @@ import os
 from datetime import datetime, date
 from sqlalchemy import (create_engine, Boolean, Column,
                         Date, DateTime, Integer, BigInteger,
-                        Float, String, Text, 
+                        Float, String, Text, func,
                         Table, ForeignKey, Index)
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.declarative import declarative_base
@@ -82,6 +82,52 @@ class NLEntity(Base):
         "Article", 
         back_populates="nl_entities")
 
+class Location(Base):
+    __tablename__ = 'locations'
+    id = Column(Integer, primary_key=True)
+
+    address = Column(String)
+    formatted_address = Column(String)
+    collected_utc_date = Column(DateTime)
+    type = Column(String)
+
+    lat = Column(Float)
+    lng = Column(Float)
+
+    has_bounds = Column(Float)
+    ne_lat = Column(Float)
+    ne_lng = Column(Float)
+    sw_lat = Column(Float)
+    sw_lng = Column(Float)
+
+    components = relationship(
+        "LocationComponent", 
+        back_populates="location")
+    types = relationship(
+        "LocationType", 
+        back_populates="location")
+
+
+class LocationComponent(Base):
+    __tablename__ = 'location_components'
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    type = Column(String)
+    location_id = Column(Integer, ForeignKey('locations.id'))
+    location = relationship(
+        "Location", 
+        back_populates="components")
+
+class LocationType(Base):
+    __tablename__ = 'location_types'
+    id = Column(Integer, primary_key=True)
+    type = Column(String)
+    location_id = Column(Integer, ForeignKey('locations.id'))
+    location = relationship(
+        "Location", 
+        back_populates="types")
+
+
 #
 # Database class
 #
@@ -149,4 +195,11 @@ class Database():
     def get_article_doc_ids(self):
         return self.session \
             .query(Article.id, Article.doc_id) \
+            .all()
+    
+    def get_entities_to_geocode(self):
+        return self.session \
+            .query(NLEntity.name) \
+            .distinct(NLEntity.name) \
+            .filter(NLEntity.proper, NLEntity.salience >= 0.1, NLEntity.type.in_( ("ORGANIZATION", "LOCATION") )) \
             .all()
