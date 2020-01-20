@@ -39,7 +39,7 @@ allowed_emails = [
 
 @app.before_request
 def before_request():
-    if request.endpoint == 'index':
+    if request.endpoint == 'index' or request.endpoint == 'static':
         return
 
     # Verify Firebase auth.
