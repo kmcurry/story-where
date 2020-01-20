@@ -12,6 +12,8 @@ for article in articles:
 
 entity_count = 0
 
+bad_files = []
+
 # Open csv files which reflect database tables
 with open('nlentities.csv', 'w',  newline='') as nlentities_csvfile:
     nlentity_writer = csv.writer(nlentities_csvfile, delimiter='\t')
@@ -24,6 +26,10 @@ with open('nlentities.csv', 'w',  newline='') as nlentities_csvfile:
 
             with open(path, 'r') as entities_file:
                 nlp_response = json.load(entities_file)
+                if 'entities' not in nlp_response:
+                    bad_files.append(path)
+                    continue
+
                 entities = nlp_response['entities']
                 for entity in entities:
                     entity_count += 1
@@ -57,5 +63,10 @@ with open('nlentities.csv', 'w',  newline='') as nlentities_csvfile:
 db.clear_nl_entities()
 
 
-print('Inserting NL Entities')
+print("Inserting NL Entities", entity_count)
 db.copy_from_file('nlentities', 'nlentities.csv', False)
+
+print("Insert complete")
+print("The following files could not be inserted because they were not formated correctly")
+for f in bad_files:
+    print(f)
