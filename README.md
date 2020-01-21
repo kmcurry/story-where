@@ -15,7 +15,9 @@ Given a corpus of news stories:
   * Voting Districts
 
 # Setup
-This web application is built on Google Cloud with Postgres and Python.
+This web application is built on Google Cloud with Postgres and Python 3.
+
+We referenced the ["Writing a Basic Web Service of App Engine"](https://cloud.google.com/appengine/docs/standard/python3/building-app/writing-web-service) guide to get started.
 
 ## Environment Variables
 The following env vars are required:
