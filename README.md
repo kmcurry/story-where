@@ -19,6 +19,11 @@ This web application is built on Google Cloud with Postgres and Python 3.
 
 We referenced the ["Writing a Basic Web Service of App Engine"](https://cloud.google.com/appengine/docs/standard/python3/building-app/writing-web-service) guide to get started.
 
+See [web-app/requirements.txt](web-app/requirements.txt) for dependencies.
+
+Mac users on Mojave may encounter an error with psycopg2, which is used by SQLAlchemy. The error can be resolved by running the following:
+`sudo installer -pkg /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg -target /` [reference](https://github.com/python-pillow/Pillow/issues/3438#issuecomment-435169249)
+
 ## Keys
 The following keys are required:
 * server-ca.pem
