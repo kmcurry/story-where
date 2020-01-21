@@ -13,3 +13,15 @@ Given a corpus of news stories:
   * Zip Codes
   * School Zones
   * Voting Districts
+
+# Setup
+This web application is built on Google Cloud with Postgres and Python.
+
+## Environment Variables
+The following env vars are required:
+* PG_USE_SSL
+* PG_CONN_STR
+* PG_CLIENT_KEY
+* PG_CLIENT_CERT
+* PG_SERVER_CA
+* GOOGLE_APPLICATION_CREDENTIALS
