@@ -2,6 +2,8 @@ articles/*
 nlp_results/*
 geocode_results/*
 *.csv
+.DS_Store
+Installation/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
