@@ -19,6 +19,12 @@ This web application is built on Google Cloud with Postgres and Python 3.
 
 We referenced the ["Writing a Basic Web Service of App Engine"](https://cloud.google.com/appengine/docs/standard/python3/building-app/writing-web-service) guide to get started.
 
+## Keys
+The following keys are required:
+* server-ca.pem
+* client-key.pem
+* client-cert.pem
+
 ## Environment Variables
 The following env vars are required:
 * PG_USE_SSL
