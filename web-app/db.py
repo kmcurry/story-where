@@ -319,6 +319,7 @@ class WebDatabase():
             .query(Article.headline, Article.release_date, Article.id) \
             .limit(count) \
             .offset(offset) \
+            .order_by(Article.id) \
             .all()
 
         return headlines
