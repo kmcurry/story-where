@@ -3,11 +3,11 @@ import os
 from datetime import datetime, date
 from sqlalchemy import (create_engine, Boolean, Column,
                         Date, DateTime, Integer, BigInteger,
-                        Float, String, Text, func,
+                        Float, String, Text, func, desc,
                         Table, ForeignKey, Index)
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship
+from sqlalchemy.orm import sessionmaker, relationship, joinedload
 from sqlalchemy.pool import NullPool
 from pprint import pprint
 from marshmallow import Schema, fields
@@ -99,7 +99,7 @@ class KeywordSchema(Schema):
 class NLEntity(Base):
     __tablename__ = 'nlentities'
     id = Column(Integer, primary_key=True)
-    name = Column(String)
+    name = Column(String, ForeignKey('locations.address'))
     type = Column(String)
     wiki = Column(String)
     salience = Column(Float)
@@ -108,6 +108,26 @@ class NLEntity(Base):
     article = relationship(
         "Article", 
         back_populates="nl_entities")
+    location = relationship(
+        "Location",
+        back_populates="nl_entities")
+
+class LocationSchema(Schema):
+    id = fields.Int(dump_only=True)
+
+    address = fields.Str()
+    formatted_address = fields.Str()
+    collected_utc_date = fields.DateTime()
+    type = fields.Str()
+
+    lat = fields.Float()
+    lng = fields.Float()
+
+    has_bounds = fields.Bool()
+    ne_lat = fields.Float()
+    ne_lng = fields.Float()
+    sw_lat = fields.Float()
+    sw_lng = fields.Float()
 
 class NLEntitySchema(Schema):
     id = fields.Int(dump_only=True)
@@ -116,6 +136,7 @@ class NLEntitySchema(Schema):
     wiki = fields.Str()
     salience = fields.Float()
     proper = fields.Bool()
+    location = fields.Nested(LocationSchema)
     articles = fields.Nested(ArticleSchema)
 
 class Location(Base):
@@ -136,13 +157,16 @@ class Location(Base):
     sw_lat = Column(Float)
     sw_lng = Column(Float)
 
+    nl_entities = relationship(
+        "NLEntity", 
+        back_populates="location")
+
     components = relationship(
         "LocationComponent", 
         back_populates="location")
     types = relationship(
         "LocationType", 
         back_populates="location")
-
 
 class LocationComponent(Base):
     __tablename__ = 'location_components'
@@ -273,3 +297,19 @@ class WebDatabase():
         article['nlEntities'] = nl_entities_schema.dump(article_entity.nl_entities)
 
         return article
+    
+    def get_locations(self, page):
+        entity_query = self.session \
+            .query(NLEntity.name, func.count('*').label('entity_count')) \
+            .filter(NLEntity.proper, NLEntity.salience >= 0.1, NLEntity.type.in_( ("ORGANIZATION", "LOCATION") )) \
+            .group_by(NLEntity.name) \
+            .order_by(desc('entity_count')) \
+            .limit(100)
+        
+        return self.session.query(entity_query).join()
+
+
+        locations = self.session.query(Location).options(
+            joinedload(Location.nl_entities).load_only(NLEntity.article_id),
+        ).order_by(func.count(Location.nl_entities)).limit(10).all()
+        return locations

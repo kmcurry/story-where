@@ -89,6 +89,14 @@ def index():
 def get_article(article_id): 
     return jsonify(db.get_article(article_id))
 
+@app.route('/entities/<int:page>')
+def get_entities(page):
+    locations = db.get_locations(page)
+    for l in locations:
+        print("=" * 10)
+        print(l)
+    return jsonify({'success': True})
+
 if __name__ == '__main__':
     # This is used when running locally only. When deploying to Google App
     # Engine, a webserver process such as Gunicorn will serve the app. This
