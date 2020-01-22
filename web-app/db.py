@@ -313,3 +313,12 @@ class WebDatabase():
             joinedload(Location.nl_entities).load_only(NLEntity.article_id),
         ).order_by(func.count(Location.nl_entities)).limit(10).all()
         return locations
+
+    def get_headlines(self, count=100, offset=0):
+        headlines = self.session \
+            .query(Article.headline, Article.release_date, Article.id) \
+            .limit(count) \
+            .offset(offset) \
+            .all()
+
+        return headlines
