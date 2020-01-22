@@ -14,6 +14,9 @@ Given a corpus of news stories:
   * School Zones
   * Voting Districts
 
+# About
+Story Where uses a corpus of news articles to extract locations and map them. Story Where is being written with 2 years of articles exported from The Virginian-Pilot's content management system. Roughly 49K articles were processed into our pilot database.
+
 # Setup
 This web application is built on Google Cloud with Postgres and Python 3.
 
