@@ -91,10 +91,10 @@ def get_article(article_id):
 
 @app.route('/entities/<int:page>')
 def get_entities(page):
-    locations = db.get_locations(page)
-    for l in locations:
+    entities = db.get_entities(page)
+    for e in entities:
         print("=" * 10)
-        print(l)
+        print(e, e[3].__dict__)
     return jsonify({'success': True})
 
 if __name__ == '__main__':
