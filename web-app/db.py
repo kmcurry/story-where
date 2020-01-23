@@ -298,23 +298,22 @@ class WebDatabase():
 
         return article
     
-    def get_locations(self, page):
+    def get_entities(self, page):
         entity_query = self.session \
-            .query(NLEntity.name, func.count('*').label('entity_count')) \
+            .query(NLEntity.name, func.count('*').label('entity_count'), func.array_agg(NLEntity.article_id)) \
             .filter(NLEntity.proper, NLEntity.salience >= 0.1, NLEntity.type.in_( ("ORGANIZATION", "LOCATION") )) \
             .group_by(NLEntity.name) \
             .order_by(desc('entity_count')) \
-            .limit(100)
-        
-        return self.session.query(entity_query).join()
+            .offset(page * 100) \
+            .limit(100) \
+            .cte()
+            
+        return self.session \
+            .query(entity_query, Location) \
+            .join(Location, entity_query.c.name==Location.address) \
+            .all()
 
-
-        locations = self.session.query(Location).options(
-            joinedload(Location.nl_entities).load_only(NLEntity.article_id),
-        ).order_by(func.count(Location.nl_entities)).limit(10).all()
-        return locations
-
-    def get_headlines(self, count=100, offset=0):
+     def get_headlines(self, count=100, offset=0):
         headlines = self.session \
             .query(Article.headline, Article.release_date, Article.id) \
             .order_by(Article.id) \
