@@ -85,6 +85,15 @@ def index():
         user_data=claims, error_message=error_message)
 # [END gae_python37_auth_verify_token]
 
+@app.route('/browse/<int:page>/<int:length>')
+def browse(page, length):
+    h = db.get_headlines(page, length)
+    error_message = None
+    return render_template(
+        'article_locations.html',
+        headlines=h, 
+        error_message=error_message)
+
 @app.route('/article/<int:article_id>')
 def get_article(article_id): 
     return jsonify(db.get_article(article_id))
