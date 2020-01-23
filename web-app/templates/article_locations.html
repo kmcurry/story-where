@@ -2,12 +2,18 @@
 <html>
 
 <style>
+    a {
+        color:blue !important;
+        cursor: pointer;
+    }
     #map {
         height: 100%;
     }
 
     #mapContainer {
         height: 800px;
+        position: fixed;
+        left: 25%;
     }
 
     html,
@@ -33,12 +39,13 @@
         <div id="headlines" class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
             <h2>Headlines</h2>
             {% if headlines %}
-
+            <ol>
             {% for headline in headlines %}
 
-            <p><a href="#" onclick="mapArticle({{ headline[2] }})">{{ headline[0] }}</a></p>
+            <li><p><a onclick="mapArticle({{ headline[2] }})">{{ headline[0] }}</a></p></li>
 
             {% endfor %}
+            </ol>
 
             {% elif error_message %}
             <p>Error: {{ error_message }}</p>
@@ -74,8 +81,6 @@
 
                     var locations = article.nlEntities.filter(nle => nle.type == "LOCATION" && nle.location !=
                         null);
-
-                    console.log(locations);
 
                     locations.forEach(location => mark(location))
 
