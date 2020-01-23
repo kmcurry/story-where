@@ -1,0 +1,176 @@
+<!doctype html>
+<html>
+
+<style>
+    a {
+        color: blue !important;
+        cursor: pointer;
+    }
+
+    #headlineList {
+        margin-top: 40px;
+    }
+
+    #listTitle {
+        position: fixed;
+        background-color: white;
+        width:100%;
+        top:0px;
+        padding-top:20px;
+    }
+
+    #map {
+        height: 100%;
+    }
+
+    #mapContainer {
+        height: 800px;
+        position: fixed;
+        left: 25%;
+    }
+
+    html,
+    body {
+        height: 100%;
+        margin: 10px;
+        padding: 10px;
+    }
+</style>
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+<script async defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<head>
+    <title>Browse Article Locations By Headline</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+
+</head>
+
+<body>
+    <div class="row">
+        <div id="headlines" class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+            <div id="listTitle">
+                <h2>Headlines</h2>
+            </div>
+            {% if headlines %}
+            <ol id="headlineList">
+                {% for headline in headlines %}
+
+                <li>
+                    <p><a onclick="mapArticle({{ headline[2] }})">{{ headline[0] }}</a></p>
+                </li>
+
+                {% endfor %}
+            </ol>
+
+            {% elif error_message %}
+            <p>Error: {{ error_message }}</p>
+            {% endif %}
+        </div>
+        <div id="mapContainer" class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
+            <div id="map">
+            </div>
+        </div>
+
+    </div>
+    <script>
+        var map;
+
+        function appendHeadline(headline) {
+            var headlineList = document.getElementById("headlineList");
+            var li = document.createElement("li");
+            var p = document.createElement("p");
+            var a = document.createElement("a");
+            var text = document.createTextNode(headline[0]);
+            var method = "mapArticle(" + headline[2] + ")";
+            console.log(method);
+            a.setAttribute(onclick, method);
+            a.appendChild(text);
+            p.appendChild(a);
+            li.appendChild(p);
+            headlineList.appendChild(li);
+        }
+
+        function getMoreHeadlines(page) {
+            
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+
+                    var headlines = JSON.parse(xhttp.responseText);
+
+                    headlines.forEach(headline => appendHeadline(headline))
+
+                }
+            };
+            xhttp.open("GET", "/headlines/" + page + "/100", true);
+            xhttp.send();
+        }
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: {
+                    lat: 36.863,
+                    lng: -76.015
+                },
+                zoom: 8
+            });
+        }
+
+        function mapArticle(articleId) {
+            console.log("Mapping Article ID: " + articleId);
+
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+
+                    var article = JSON.parse(xhttp.responseText);
+
+                    var locations = article.nlEntities.filter(nle => nle.type == "LOCATION" && nle.location !=
+                        null);
+
+                    locations.forEach(location => mark(location))
+
+                }
+            };
+            xhttp.open("GET", "/article/" + articleId, true);
+            xhttp.send();
+        }
+
+        function mark(location) {
+            var myLatLng = {
+                lat: location.location.lat,
+                lng: location.location.lng
+            };
+
+            console.log(myLatLng);
+
+            var marker = new google.maps.Marker({
+                position: myLatLng,
+                map: map,
+                title: location.location.name
+            });
+        }
+
+        var numScrolls = 0;
+        $(window).scroll(function () {
+            if ($(window).scrollTop() == $(document).height() - $(window).height()) {
+                // ajax call get data from server and append to the div
+                getMoreHeadlines(numScrolls++)
+            }
+        });
+    </script>
+
+    
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBUTbge6vBRkzguyuwbBSVT_2Wu_gLi9nQ&callback=initMap">
+    </script>
+
+
+</body>
+
+</html>
