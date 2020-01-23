@@ -85,6 +85,8 @@ def index():
         user_data=claims, error_message=error_message)
 # [END gae_python37_auth_verify_token]
 
+@app.route("/browse/", defaults={"page": 0, "length": 100})
+@app.route("/browse/<int:page>/", defaults={"length": 100})
 @app.route('/browse/<int:page>/<int:length>')
 def browse(page, length):
     h = db.get_headlines(page, length)
