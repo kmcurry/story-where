@@ -7,7 +7,7 @@
     }
 
     #mapContainer {
-        height:800px;
+        height: 800px;
     }
 
     html,
@@ -36,7 +36,7 @@
 
             {% for headline in headlines %}
 
-            <p><a href="" onclick="mapArticle({{ headline[2] }})">{{ headline[0] }}</a></p>
+            <p><a href="#" onclick="mapArticle({{ headline[2] }})">{{ headline[0] }}</a></p>
 
             {% endfor %}
 
@@ -60,6 +60,43 @@
                     lng: -76.015
                 },
                 zoom: 8
+            });
+        }
+
+        function mapArticle(articleId) {
+            console.log("Mapping Article ID: " + articleId);
+
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+
+                    var article = JSON.parse(xhttp.responseText);
+
+                    var locations = article.nlEntities.filter(nle => nle.type == "LOCATION" && nle.location !=
+                        null);
+
+                    console.log(locations);
+
+                    locations.forEach(location => mark(location))
+
+                }
+            };
+            xhttp.open("GET", "/article/" + articleId, true);
+            xhttp.send();
+        }
+
+        function mark(location) {
+            var myLatLng = {
+                lat: location.location.lat,
+                lng: location.location.lng
+            };
+
+            console.log(myLatLng);
+
+            var marker = new google.maps.Marker({
+                position: myLatLng,
+                map: map,
+                title: location.location.name
             });
         }
     </script>
