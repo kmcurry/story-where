@@ -7,6 +7,18 @@
         cursor: pointer;
     }
 
+    #headlineList {
+        margin-top: 40px;
+    }
+
+    #listTitle {
+        position: fixed;
+        background-color: white;
+        width:100%;
+        top:0px;
+        padding-top:20px;
+    }
+
     #map {
         height: 100%;
     }
@@ -41,7 +53,9 @@
 <body>
     <div class="row">
         <div id="headlines" class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
-            <h2>Headlines</h2>
+            <div id="listTitle">
+                <h2>Headlines</h2>
+            </div>
             {% if headlines %}
             <ol id="headlineList">
                 {% for headline in headlines %}
@@ -72,7 +86,9 @@
             var p = document.createElement("p");
             var a = document.createElement("a");
             var text = document.createTextNode(headline[0]);
-            a.setAttribute(onclick, "mapArticle(" + headline[2] + ")");
+            var method = "mapArticle(" + headline[2] + ")";
+            console.log(method);
+            a.setAttribute(onclick, method);
             a.appendChild(text);
             p.appendChild(a);
             li.appendChild(p);
