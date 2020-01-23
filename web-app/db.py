@@ -312,3 +312,13 @@ class WebDatabase():
             .query(entity_query, Location) \
             .join(Location, entity_query.c.name==Location.address) \
             .all()
+
+     def get_headlines(self, count=100, offset=0):
+        headlines = self.session \
+            .query(Article.headline, Article.release_date, Article.id) \
+            .order_by(Article.id) \
+            .limit(count) \
+            .offset(offset) \
+            .all()
+
+        return headlines

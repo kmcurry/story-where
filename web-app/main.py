@@ -97,6 +97,13 @@ def get_entities(page):
         print(e, e[3].__dict__)
     return jsonify({'success': True})
 
+@app.route('/headlines', methods=['GET'])
+def get_headlines(): 
+    c = request.args.get('count', 100)
+    o = request.args.get('offset', 0)
+    headlines = db.get_headlines(c, o)
+    return jsonify(headlines)
+
 if __name__ == '__main__':
     # This is used when running locally only. When deploying to Google App
     # Engine, a webserver process such as Gunicorn will serve the app. This
