@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+
+<style>
+    #map {
+        height: 100%;
+    }
+
+    #mapContainer {
+        height:800px;
+    }
+
+    html,
+    body {
+        height: 100%;
+        margin: 10px;
+        padding: 10px;
+    }
+</style>
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+<head>
+    <title>Browse Article Locations By Headline</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+
+</head>
+
+<body>
+    <div class="row">
+        <div id="headlines" class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+            <h2>Headlines</h2>
+            {% if headlines %}
+
+            {% for headline in headlines %}
+
+            <p><a href="" onclick="mapArticle({{ headline[2] }})">{{ headline[0] }}</a></p>
+
+            {% endfor %}
+
+            {% elif error_message %}
+            <p>Error: {{ error_message }}</p>
+            {% endif %}
+        </div>
+        <div id="mapContainer" class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
+            <div id="map">
+            </div>
+        </div>
+
+    </div>
+    <script>
+        var map;
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: {
+                    lat: 36.863,
+                    lng: -76.015
+                },
+                zoom: 8
+            });
+        }
+    </script>
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBUTbge6vBRkzguyuwbBSVT_2Wu_gLi9nQ&callback=initMap">
+    </script>
+
+
+</body>
+
+</html>
