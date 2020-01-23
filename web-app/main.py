@@ -97,11 +97,9 @@ def get_entities(page):
         print(e, e[3].__dict__)
     return jsonify({'success': True})
 
-@app.route('/headlines', methods=['GET'])
-def get_headlines(): 
-    c = request.args.get('count', 100)
-    o = request.args.get('offset', 0)
-    headlines = db.get_headlines(c, o)
+@app.route('/headlines/<int:page>/<int:length>')
+def get_headlines(page, length): 
+    headlines = db.get_headlines(page, length)
     return jsonify(headlines)
 
 if __name__ == '__main__':
