@@ -100,6 +100,7 @@ def browse(page, length):
 def get_article(article_id): 
     return jsonify(db.get_article(article_id))
 
+@app.route("/entities/", defaults={"page": 0})
 @app.route('/entities/<int:page>')
 def get_entities(page):
     entities = db.get_entities(page)
@@ -108,6 +109,8 @@ def get_entities(page):
         print(e, e[3].__dict__)
     return jsonify({'success': True})
 
+@app.route("/headlines/", defaults={"page": 0, "length": 100})
+@app.route("/headlines/<int:page>/", defaults={"length": 100})
 @app.route('/headlines/<int:page>/<int:length>')
 def get_headlines(page, length): 
     headlines = db.get_headlines(page, length)
