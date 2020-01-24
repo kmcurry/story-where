@@ -332,7 +332,7 @@ class WebDatabase():
             .offset(page * length) \
             .all()
 
-        nl_entities_schema = NLEntitySchema(many=True, exclude=["articles"])
+        nl_entities_schema = NLEntitySchema(many=True)
         locations_proper = nl_entities_schema.dump(locations_proper)
         
         return locations_proper
