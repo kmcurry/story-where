@@ -322,3 +322,14 @@ class WebDatabase():
             .all()
 
         return headlines
+
+    def get_locations_proper(self, page, length):
+        locations_proper = self.session \
+            .query(NLEntity.name, NLEntity.proper, NLEntity.salience, NLEntity.type) \
+            .distinct(NLEntity.name) \
+            .filter(NLEntity.proper, NLEntity.salience >= 0.1, NLEntity.type=="LOCATION") \
+            .limit(length)  \
+            .offset(page * length) \
+            .all()
+        
+        return locations_proper
