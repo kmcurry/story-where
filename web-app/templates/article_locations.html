@@ -80,15 +80,17 @@
     <script>
         var map;
 
-        function appendHeadline(headline) {
+        function appendHeadline(headline, page) {
             var headlineList = document.getElementById("headlineList");
             var li = document.createElement("li");
             var p = document.createElement("p");
             var a = document.createElement("a");
             var text = document.createTextNode(headline[0]);
-            var method = "mapArticle(" + headline[2] + ")";
-            console.log(method);
-            a.setAttribute(onclick, method);
+            var hl = headline[2];
+            console.log(hl);
+            hl = parseInt(hl);
+            var method = "mapArticle(" + hl + ")";
+            a.setAttribute("onclick", method);
             a.appendChild(text);
             p.appendChild(a);
             li.appendChild(p);
@@ -103,7 +105,7 @@
 
                     var headlines = JSON.parse(xhttp.responseText);
 
-                    headlines.forEach(headline => appendHeadline(headline))
+                    headlines.forEach(headline => appendHeadline(headline, page))
 
                 }
             };
@@ -180,7 +182,7 @@
         $(window).scroll(function () {
             if ($(window).scrollTop() == $(document).height() - $(window).height()) {
                 // ajax call get data from server and append to the div
-                getMoreHeadlines(numScrolls++)
+                getMoreHeadlines(++numScrolls)
             }
         });
     </script>
