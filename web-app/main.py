@@ -116,6 +116,13 @@ def get_headlines(page, length):
     headlines = db.get_headlines(page, length)
     return jsonify(headlines)
 
+@app.route("/locations-proper/", defaults={"page": 0, "length": 100})
+@app.route("/locations-proper/<int:page>/", defaults={"length": 100})
+@app.route("/locations-proper/<int:page>/<int:length>")
+def get_locations_proper(page, length):
+    locations_proper = db.get_locations_proper(page, length)
+    return jsonify(locations_proper)
+
 if __name__ == '__main__':
     # This is used when running locally only. When deploying to Google App
     # Engine, a webserver process such as Gunicorn will serve the app. This
