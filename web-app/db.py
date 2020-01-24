@@ -325,11 +325,14 @@ class WebDatabase():
 
     def get_locations_proper(self, page, length):
         locations_proper = self.session \
-            .query(NLEntity.name, NLEntity.proper, NLEntity.salience, NLEntity.type) \
+            .query(NLEntity) \
             .distinct(NLEntity.name) \
             .filter(NLEntity.proper, NLEntity.salience >= 0.1, NLEntity.type=="LOCATION") \
             .limit(length)  \
             .offset(page * length) \
             .all()
+
+        nl_entities_schema = NLEntitySchema(many=True, exclude=["articles"])
+        locations_proper = nl_entities_schema.dump(locations_proper)
         
         return locations_proper
