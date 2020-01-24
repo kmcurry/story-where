@@ -14,9 +14,9 @@
     #listTitle {
         position: fixed;
         background-color: white;
-        width:100%;
-        top:0px;
-        padding-top:20px;
+        width: 100%;
+        top: 0px;
+        padding-top: 20px;
     }
 
     #map {
@@ -96,7 +96,7 @@
         }
 
         function getMoreHeadlines(page) {
-            
+
             var xhttp = new XMLHttpRequest();
             xhttp.onreadystatechange = function () {
                 if (this.readyState == 4 && this.status == 200) {
@@ -119,6 +119,7 @@
                 },
                 zoom: 8
             });
+
         }
 
         function mapArticle(articleId) {
@@ -152,8 +153,27 @@
             var marker = new google.maps.Marker({
                 position: myLatLng,
                 map: map,
-                title: location.location.name
+                title: location.name
             });
+
+            var contentString = '<div id="content">' +
+                '<div id="siteNotice">' +
+                '</div>' +
+                '<h1 id="firstHeading" class="firstHeading">'+ location.name + '</h1>' +
+                '<div id="bodyContent">' +
+                '<p><b>' + location.location.formatted_address + '</b></p>' +
+                '</div>' +
+                '</div>';
+
+            var infowindow = new google.maps.InfoWindow({
+                content: contentString
+            });
+
+
+            marker.addListener('click', function () {
+                infowindow.open(map, marker);
+            });
+
         }
 
         var numScrolls = 0;
@@ -165,7 +185,7 @@
         });
     </script>
 
-    
+
     <script async defer
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBUTbge6vBRkzguyuwbBSVT_2Wu_gLi9nQ&callback=initMap">
     </script>
