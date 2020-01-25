@@ -58,6 +58,8 @@ def before_request():
         error_message = str(exc)
         return jsonify({'error': error_message}) 
 
+#vv########################### Pages ################################
+
 # [START gae_python37_auth_verify_token]
 @app.route('/')
 def index():
@@ -96,6 +98,8 @@ def browse(page, length):
         headlines=h, 
         error_message=error_message)
 
+#vv########################### API ################################
+
 @app.route('/article/<int:article_id>')
 def get_article(article_id): 
     return jsonify(db.get_article(article_id))
@@ -122,6 +126,9 @@ def get_headlines(page, length):
 def get_proper_locations(page, length):
     proper_locations = db.get_proper_locations(page, length)
     return jsonify(proper_locations)
+
+
+#vv########################### MAIN ################################
 
 if __name__ == '__main__':
     # This is used when running locally only. When deploying to Google App
