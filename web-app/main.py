@@ -98,6 +98,11 @@ def browse(page, length):
         headlines=h, 
         error_message=error_message)
 
+@app.route("/browse_entities/")
+def browse_entities():
+    return render_template(
+        'entity_locations.html')
+
 #vv########################### API ################################
 
 @app.route('/article/<int:article_id>')
