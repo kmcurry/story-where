@@ -300,10 +300,22 @@ class WebDatabase():
             .limit(100) \
             .cte()
             
-        return self.session \
+        entities = self.session \
             .query(entity_query, Location) \
             .join(Location, entity_query.c.name==Location.address) \
+            .order_by(desc('entity_count')) \
             .all()
+        
+        location_schema = LocationSchema()
+
+        return [
+            {
+                "entity": e[0],
+                "article_count": e[1],
+                "article_ids": e[2],
+                "location": location_schema.dump(e[3])
+            } for e in entities
+        ]
 
     def get_headlines(self, page, length):
         headlines = self.session \

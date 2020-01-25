@@ -108,10 +108,7 @@ def get_article(article_id):
 @app.route('/entities/<int:page>')
 def get_entities(page):
     entities = db.get_entities(page)
-    for e in entities:
-        print("=" * 10)
-        print(e, e[3].__dict__)
-    return jsonify({'success': True})
+    return jsonify(entities)
 
 @app.route("/headlines/", defaults={"page": 0, "length": 100})
 @app.route("/headlines/<int:page>/", defaults={"length": 100})
