@@ -4,7 +4,7 @@ from datetime import datetime, date
 from sqlalchemy import (create_engine, Boolean, Column,
                         Date, DateTime, Integer, BigInteger,
                         Float, String, Text, func, desc,
-                        Table, ForeignKey, Index)
+                        Table, ForeignKey, Index, distinct)
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship, joinedload
@@ -323,6 +323,23 @@ class WebDatabase():
 
         return headlines
 
+    def get_info(self, salience):
+        info = []
+
+        num_distinct_proper_locations = self.session \
+            .query(func.count(distinct(NLEntity.name))) \
+            .filter(NLEntity.proper, NLEntity.salience >= salience, NLEntity.type=="LOCATION") \
+            .scalar()
+
+        num_distinct_proper_organizations = self.session \
+            .query(func.count(distinct(NLEntity.name))) \
+            .filter(NLEntity.proper, NLEntity.salience >= salience, NLEntity.type=="ORGANIZATION") \
+            .scalar()
+
+        info.append(['distinct_proper_locations', num_distinct_proper_locations])
+        info.append(['distinct_proper_organizations', num_distinct_proper_organizations])
+        return info
+    
     def get_proper_locations(self, page, length):
         proper_locations = self.session \
             .query(NLEntity) \

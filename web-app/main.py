@@ -127,6 +127,12 @@ def get_proper_locations(page, length):
     proper_locations = db.get_proper_locations(page, length)
     return jsonify(proper_locations)
 
+@app.route("/info/", defaults={"salience": 0.1})
+@app.route("/info/<float:salience>")
+def get_info(salience):
+    info = db.get_info(salience)
+    return jsonify(info)
+
 
 #vv########################### MAIN ################################
 
