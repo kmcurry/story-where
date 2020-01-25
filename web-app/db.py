@@ -292,7 +292,7 @@ class WebDatabase():
     
     def get_entities(self, page):
         entity_query = self.session \
-            .query(NLEntity.name, func.count('*').label('entity_count'), func.array_agg(NLEntity.article_id)) \
+            .query(NLEntity.name, func.count(NLEntity.article_id).label('entity_count'), func.array_agg(NLEntity.article_id)) \
             .filter(NLEntity.proper, NLEntity.salience >= 0.1, NLEntity.type.in_( ("ORGANIZATION", "LOCATION") )) \
             .group_by(NLEntity.name) \
             .order_by(desc('entity_count')) \
