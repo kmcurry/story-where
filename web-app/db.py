@@ -340,11 +340,11 @@ class WebDatabase():
         info.append(['distinct_proper_organizations', num_distinct_proper_organizations])
         return info
     
-    def get_proper_locations(self, page, length):
+    def get_proper_locations(self, salience, page, length):
         proper_locations = self.session \
             .query(NLEntity) \
             .distinct(NLEntity.name) \
-            .filter(NLEntity.proper, NLEntity.salience >= 0.1, NLEntity.type=="LOCATION") \
+            .filter(NLEntity.proper, NLEntity.salience >= salience, NLEntity.type=="LOCATION") \
             .limit(length)  \
             .offset(page * length) \
             .all()
@@ -353,3 +353,17 @@ class WebDatabase():
         proper_locations = nl_entities_schema.dump(proper_locations)
         
         return proper_locations
+    
+    def get_proper_organizations(self, salience, page, length):
+        proper_organizations = self.session \
+            .query(NLEntity) \
+            .distinct(NLEntity.name) \
+            .filter(NLEntity.proper, NLEntity.salience >= salience, NLEntity.type=="ORGANIZATION") \
+            .limit(length)  \
+            .offset(page * length) \
+            .all()
+
+        nl_entities_schema = NLEntitySchema(many=True)
+        proper_organizations = nl_entities_schema.dump(proper_organizations)
+        
+        return proper_organizations

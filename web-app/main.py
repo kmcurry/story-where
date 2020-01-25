@@ -120,12 +120,21 @@ def get_headlines(page, length):
     headlines = db.get_headlines(page, length)
     return jsonify(headlines)
 
-@app.route("/proper-locations/", defaults={"page": 0, "length": 100})
-@app.route("/proper-locations/<int:page>/", defaults={"length": 100})
-@app.route("/proper-locations/<int:page>/<int:length>")
-def get_proper_locations(page, length):
-    proper_locations = db.get_proper_locations(page, length)
+@app.route("/proper-locations/", defaults={"salience": 0.1, "page": 0, "length": 100})
+@app.route("/proper-locations/<float:salience>", defaults={"page": 0, "length": 100})
+@app.route("/proper-locations/<float:salience>/<int:page>/", defaults={"length": 100})
+@app.route("/proper-locations/<float:salience>/<int:page>/<int:length>")
+def get_proper_locations(salience, page, length):
+    proper_locations = db.get_proper_locations(salience, page, length)
     return jsonify(proper_locations)
+
+@app.route("/proper-organizations/", defaults={"salience": 0.1, "page": 0, "length": 100})
+@app.route("/proper-organizations/<float:salience>", defaults={"page": 0, "length": 100})
+@app.route("/proper-organizations/<float:salience>/<int:page>/", defaults={"length": 100})
+@app.route("/proper-organizations/<float:salience>/<int:page>/<int:length>")
+def get_proper_organizations(salience, page, length):
+    proper_organizations = db.get_proper_organizations(salience, page, length)
+    return jsonify(proper_organizations)
 
 @app.route("/info/", defaults={"salience": 0.1})
 @app.route("/info/<float:salience>")
