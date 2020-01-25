@@ -68,6 +68,10 @@ class ArticleSchema(Schema):
     tagline = fields.Str()
     nlp_date = fields.DateTime()
 
+    sections = fields.List(fields.Nested(lambda: SectionSchema))
+    keywords = fields.List(fields.Nested(lambda: KeywordSchema))
+    nl_entities = fields.List(fields.Nested(lambda: NLEntitySchema))
+
 class Section(Base):
     __tablename__ = 'sections'
     id = Column(Integer, primary_key=True)
@@ -80,7 +84,6 @@ class Section(Base):
 class SectionSchema(Schema):
     id = fields.Int(dump_only=True)
     name = fields.Str()
-    articles = fields.Nested(ArticleSchema)
 
 class Keyword(Base):
     __tablename__ = 'keywords'
@@ -94,7 +97,6 @@ class Keyword(Base):
 class KeywordSchema(Schema):
     id = fields.Int(dump_only=True)
     name = fields.Str()
-    articles = fields.Nested(ArticleSchema)
 
 class NLEntity(Base):
     __tablename__ = 'nlentities'
@@ -112,23 +114,6 @@ class NLEntity(Base):
         "Location",
         back_populates="nl_entities")
 
-class LocationSchema(Schema):
-    id = fields.Int(dump_only=True)
-
-    address = fields.Str()
-    formatted_address = fields.Str()
-    collected_utc_date = fields.DateTime()
-    type = fields.Str()
-
-    lat = fields.Float()
-    lng = fields.Float()
-
-    has_bounds = fields.Bool()
-    ne_lat = fields.Float()
-    ne_lng = fields.Float()
-    sw_lat = fields.Float()
-    sw_lng = fields.Float()
-
 class NLEntitySchema(Schema):
     id = fields.Int(dump_only=True)
     name = fields.Str()
@@ -136,8 +121,7 @@ class NLEntitySchema(Schema):
     wiki = fields.Str()
     salience = fields.Float()
     proper = fields.Bool()
-    location = fields.Nested(LocationSchema)
-    articles = fields.Nested(ArticleSchema)
+    location = fields.Nested(lambda: LocationSchema)
 
 class Location(Base):
     __tablename__ = 'locations'
@@ -167,6 +151,23 @@ class Location(Base):
     types = relationship(
         "LocationType", 
         back_populates="location")
+
+class LocationSchema(Schema):
+    id = fields.Int(dump_only=True)
+
+    address = fields.Str()
+    formatted_address = fields.Str()
+    collected_utc_date = fields.DateTime()
+    type = fields.Str()
+
+    lat = fields.Float()
+    lng = fields.Float()
+
+    has_bounds = fields.Bool()
+    ne_lat = fields.Float()
+    ne_lng = fields.Float()
+    sw_lat = fields.Float()
+    sw_lng = fields.Float()
 
 class LocationComponent(Base):
     __tablename__ = 'location_components'
@@ -286,15 +287,6 @@ class WebDatabase():
 
         article_schema = ArticleSchema()
         article = article_schema.dump(article_entity)
-
-        sections_schema = SectionSchema(many=True, exclude=["articles"])
-        article['sections'] = sections_schema.dump(article_entity.sections)
-
-        keywords_schema = KeywordSchema(many=True, exclude=["articles"])
-        article['keywords'] = keywords_schema.dump(article_entity.keywords)
-
-        nl_entities_schema = NLEntitySchema(many=True, exclude=["articles"])
-        article['nlEntities'] = nl_entities_schema.dump(article_entity.nl_entities)
 
         return article
     
