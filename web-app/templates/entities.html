@@ -7,7 +7,7 @@
         cursor: pointer;
     }
 
-    #locationList {
+    #entityList {
         margin-top: 40px;
     }
 
@@ -44,23 +44,23 @@
 
 
 <head>
-    <title>Locations of Articles</title>
+    <title>Entities</title>
     <meta name="viewport" content="initial-scale=1.0">
     <meta charset="utf-8">
 </head>
 
 <body>
     <div class="row">
-        <div id="locations" class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+        <div id="entities" class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
             <div id="listTitle">
-                <h2>Locations (DRAFT)</h2>
+                <h2>Entities (DRAFT)</h2>
             </div>
-            {% if locations %}
-            <ol id="locationList">
-                {% for location in locations %}
+            {% if entities %}
+            <ol id="entityList">
+                {% for entity in entities %}
 
                 <li>
-                    <p><a onclick="showLocation({{ location.location.lat }}, {{ location.location.lng }})">{{ location.name }}</a></p>
+                    <p><a onclick="showEntity({{ entity }})">{{ entity.entity }}</a></p>
                 </li>
     
                 {% endfor %}
@@ -86,11 +86,14 @@
             heatMapData = new google.maps.MVCArray([]);
 
             /* Data points defined as a mixture of WeightedLocation and LatLng objects */
-            var locs = {{locations|tojson}};
+            var ents = {{entities|tojson}};
 
-            locs.forEach(function(location) {
+            ents.forEach(function(entity) {
                 //console.log(location)
-                heatMapData.push(new google.maps.LatLng(location.location.lat, location.location.lng))
+                heatMapData.push({
+                    "location":new google.maps.LatLng(entity.location.lat, entity.location.lng),
+                    "weight":entity.article_count
+                    });
             })
 
             var hampton_roads = new google.maps.LatLng(36.6, -76.3637);
@@ -109,57 +112,59 @@
 
         }
 
-        function appendLocation(location, page) {
-            var name = location.name
-            location = location.location
-            console.log(location);
-            var locationList = document.getElementById("locationList");
+        function appendEntity(entity, page) {
+            var name = entity.entity
+            var loc = entity.location
+            var lat = loc.lat;
+            var lng = loc.lng;
+            console.log(lat + ", " + lng + " article count: " + entity.article_count);
+            var entityList = document.getElementById("entityList");
             var li = document.createElement("li");
             var p = document.createElement("p");
             var a = document.createElement("a");
             var text = document.createTextNode(name);
-            var loc = location.lat;
-            //console.log(loc);
-            loc = parseInt(loc);
-            var method = "showArticles(" + location + ")";
+            var method = "showArticles(" + entity + ")";
             a.setAttribute("onclick", method);
             a.appendChild(text);
             p.appendChild(a);
             li.appendChild(p);
-            locationList.appendChild(li);
+            entityList.appendChild(li);
 
-            heatMapData.push(new google.maps.LatLng(location.lat, location.lng)
-                        );
+            heatMapData.push({
+                    "location":new google.maps.LatLng(lat, lng),
+                    "weight": entity.article_count
+                    });
         }
 
-        function getMoreLocations(page) {
+        function getMoreEntities(page) {
 
-            console.log("fetching more locations")
+            console.log("fetching more entities")
                 
 
             var xhttp = new XMLHttpRequest();
             xhttp.onreadystatechange = function () {
                 if (this.readyState == 4 && this.status == 200) {
 
-                    var locations = JSON.parse(xhttp.responseText);
+                    var entities = JSON.parse(xhttp.responseText);
+                    //console.log(entities);
 
-                    locations.forEach(location => appendLocation(location, page));
+                    entities.forEach(entity => appendEntity(entity, page));
 
                 }
                 console.log(this.status);
             };
-            xhttp.open("GET", "/proper-locations/0.1/" + page, true);
+            xhttp.open("GET", "/entities/" + page, true);
             xhttp.send();
         }
 
-        function showArticles(lat, lng) {
-            console.log("Mapping Location: " + lat + ", " + lng);
+        function showArticles(entity) {
+            console.log("Showing Articles for Entity: " + entity);
         }
 
-        function mark(location) {
+        function mark(entity) {
             var myLatLng = {
-                lat: location.location.lat,
-                lng: location.location.lng
+                lat: entity.location.lat,
+                lng: entity.location.lng
             };
 
             console.log(myLatLng);
@@ -167,7 +172,7 @@
             var marker = new google.maps.Marker({
                 position: myLatLng,
                 map: map,
-                title: location.name
+                title: entity.name
             });
 
         }
@@ -176,7 +181,7 @@
         $(window).scroll(function () {
             if ($(window).scrollTop() == $(document).height() - $(window).height()) {
                 // ajax call get data from server and append to the div
-                getMoreLocations(++numScrolls)
+                getMoreEntities(++numScrolls)
             }
         });
     </script>
