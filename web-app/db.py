@@ -344,7 +344,7 @@ class WebDatabase():
         info.append(['distinct_proper_organizations', num_distinct_proper_organizations])
         return info
     
-    def get_proper_locations(self, salience, page, length):
+    def get_proper_locations(self, salience=0.1, page=0, length=100):
         proper_locations = self.session \
             .query(NLEntity) \
             .distinct(NLEntity.name) \
