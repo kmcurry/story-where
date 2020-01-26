@@ -66,29 +66,19 @@
         var map;
 
         var heatMapData = null;
-            
+        var iconUrl = 'http://icons.iconarchive.com/icons/mad-science/arcade-saturdays/32/Dot-icon.png';
+
 
         function initMap() {
 
             heatMapData = new google.maps.MVCArray([]);
-
-            /* Data points defined as a mixture of WeightedLocation and LatLng objects */
-            var ents = {{entities|tojson}};
-
-            ents.forEach(function(entity) {
-                //console.log(location)
-                heatMapData.push({
-                    "location":new google.maps.LatLng(entity.location.lat, entity.location.lng),
-                    "weight":entity.article_count,
-                });
-
-            })
 
             var hampton_roads = new google.maps.LatLng(36.6, -76.3637);
 
             map = new google.maps.Map(document.getElementById('map'), {
                 center: hampton_roads,
                 zoom: 9,
+                icon: iconUrl,
                 styles: [
                         {elementType: 'geometry', stylers: [{color: '#242f3e'}]},
                         {elementType: 'labels.text.stroke', stylers: [{color: '#242f3e'}]},
@@ -171,10 +161,10 @@
                     ]
             });
 
-            var heatmap = new google.maps.visualization.HeatmapLayer({
-                data: heatMapData
-            });
-            heatmap.setMap(map);
+            // var heatmap = new google.maps.visualization.HeatmapLayer({
+            //     data: heatMapData
+            // });
+            // heatmap.setMap(map);
 
             getMoreEntities(0);
         }
@@ -188,8 +178,8 @@
             var small = document.createElement("small");
             var smallText = document.createTextNode(entity['article_count'] + " articles");
             console.log(entity);
-            var method = "mapArticle(" + entity['location']['lat'] + "," + entity['location']['lng'] + ")";
-            a.setAttribute("onclick", method);
+            // var method = "mapArticles(" + entity.article_ids + ")";
+            // a.setAttribute("onclick", method);
             a.appendChild(text);
             small.appendChild(smallText);
             p.appendChild(a);
@@ -198,10 +188,12 @@
             li.appendChild(p);
             entitiesList.appendChild(li);
 
-            heatMapData.push({
-                    "location":new google.maps.LatLng( entity['location']['lat'],  entity['location']['lng']),
-                    "weight": entity.article_count
-                    });
+            // heatMapData.push({
+            //         "location":new google.maps.LatLng( entity['location']['lat'],  entity['location']['lng']),
+            //         "weight": entity.article_count
+            //         });
+
+            mark(entity.location);
         }
 
         function getMoreEntities(page) {
@@ -225,14 +217,33 @@
             xhttp.send();
         }
 
-        function showArticles(entity) {
-            console.log("Showing Articles for Entity: " + entity);
+        function mapArticles(article_ids) {
+            console.log("Mapping Entity: " + article_ids);
+
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+
+                    var article = JSON.parse(xhttp.responseText);
+
+                    var locations = article.nl_entities.filter(nle => nle.type == "LOCATION" && nle.location != null);
+
+                    locations.forEach(location => mark(location))
+
+                }
+            };
+
+            article_ids.forEach(function(articleId) {
+                xhttp.open("GET", "/article/" + articleId, true);
+                xhttp.send();
+            });
+
         }
 
-        function mark(entity) {
+        function mark(location) {
             var myLatLng = {
-                lat: entity.location.lat,
-                lng: entity.location.lng
+                lat: location.lat,
+                lng: location.lng
             };
 
             console.log(myLatLng);
@@ -240,9 +251,13 @@
             var marker = new google.maps.Marker({
                 position: myLatLng,
                 map: map,
-                title: entity.name
+                icon: iconUrl
             });
 
+        }
+
+        function showArticles(entity) {
+            console.log("Showing Articles for Entity: " + entity);
         }
 
         var numScrolls = 0;
