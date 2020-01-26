@@ -201,7 +201,7 @@ class Database():
         return self.session \
             .query(NLEntity.name) \
             .distinct(NLEntity.name) \
-            .filter(NLEntity.proper, NLEntity.salience >= 0.1, NLEntity.type.in_( ("ORGANIZATION", "LOCATION") )) \
+            .filter(NLEntity.proper, NLEntity.salience >= 0.01, NLEntity.type.in_( ("ORGANIZATION", "LOCATION") )) \
             .all()
 
 class WebDatabase():

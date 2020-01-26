@@ -48,8 +48,8 @@ with open('locations.csv', 'w',  newline='') as loc_file, \
                     loc_component_count += 1
                     loc_components_writer.writerow([
                         loc_component_count,
-                        component['long_name'],
-                        component['types'][0],
+                        component['long_name'].encode("ascii", errors="ignore").decode(),
+                        component['types'][0] if len(component['types']) > 0 else "NO_TYPE",
                         location_count
                     ])
 
