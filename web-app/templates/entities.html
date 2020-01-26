@@ -92,8 +92,9 @@
                 //console.log(location)
                 heatMapData.push({
                     "location":new google.maps.LatLng(entity.location.lat, entity.location.lng),
-                    "weight":entity.article_count
-                    });
+                    "weight":entity.article_count,
+                });
+
             })
 
             var hampton_roads = new google.maps.LatLng(36.6, -76.3637);
@@ -101,7 +102,86 @@
             map = new google.maps.Map(document.getElementById('map'), {
                 center: hampton_roads,
                 zoom: 9,
-                mapTypeId: 'satellite'
+                styles: [
+                        {elementType: 'geometry', stylers: [{color: '#242f3e'}]},
+                        {elementType: 'labels.text.stroke', stylers: [{color: '#242f3e'}]},
+                        {elementType: 'labels.text.fill', stylers: [{color: '#746855'}]},
+                        {
+                        featureType: 'administrative.locality',
+                        elementType: 'labels.text.fill',
+                        stylers: [{color: '#d59563'}]
+                        },
+                        {
+                        featureType: 'poi',
+                        elementType: 'labels.text.fill',
+                        stylers: [{color: '#d59563'}]
+                        },
+                        {
+                        featureType: 'poi.park',
+                        elementType: 'geometry',
+                        stylers: [{color: '#263c3f'}]
+                        },
+                        {
+                        featureType: 'poi.park',
+                        elementType: 'labels.text.fill',
+                        stylers: [{color: '#6b9a76'}]
+                        },
+                        {
+                        featureType: 'road',
+                        elementType: 'geometry',
+                        stylers: [{color: '#38414e'}]
+                        },
+                        {
+                        featureType: 'road',
+                        elementType: 'geometry.stroke',
+                        stylers: [{color: '#212a37'}]
+                        },
+                        {
+                        featureType: 'road',
+                        elementType: 'labels.text.fill',
+                        stylers: [{color: '#9ca5b3'}]
+                        },
+                        {
+                        featureType: 'road.highway',
+                        elementType: 'geometry',
+                        stylers: [{color: '#746855'}]
+                        },
+                        {
+                        featureType: 'road.highway',
+                        elementType: 'geometry.stroke',
+                        stylers: [{color: '#1f2835'}]
+                        },
+                        {
+                        featureType: 'road.highway',
+                        elementType: 'labels.text.fill',
+                        stylers: [{color: '#f3d19c'}]
+                        },
+                        {
+                        featureType: 'transit',
+                        elementType: 'geometry',
+                        stylers: [{color: '#2f3948'}]
+                        },
+                        {
+                        featureType: 'transit.station',
+                        elementType: 'labels.text.fill',
+                        stylers: [{color: '#d59563'}]
+                        },
+                        {
+                        featureType: 'water',
+                        elementType: 'geometry',
+                        stylers: [{color: '#17263c'}]
+                        },
+                        {
+                        featureType: 'water',
+                        elementType: 'labels.text.fill',
+                        stylers: [{color: '#515c6d'}]
+                        },
+                        {
+                        featureType: 'water',
+                        elementType: 'labels.text.stroke',
+                        stylers: [{color: '#17263c'}]
+                        }
+                    ]
             });
 
             var heatmap = new google.maps.visualization.HeatmapLayer({
@@ -117,7 +197,6 @@
             var loc = entity.location
             var lat = loc.lat;
             var lng = loc.lng;
-            console.log(lat + ", " + lng + " article count: " + entity.article_count);
             var entityList = document.getElementById("entityList");
             var li = document.createElement("li");
             var p = document.createElement("p");
