@@ -167,13 +167,14 @@ with open('articles.csv', 'w',  newline='') as articles_csvfile, \
             # Parse the xml and get the data we need
             xml = ET.parse(path).getroot()
             article = get_data_from_article()
-            article_count += 1
-            article['id'] = article_count # this is the primary key for the article table
-            article['filepath'] = path.replace('\\', '/') # backslashes break the copy_file
-
+            
             if any([s in filtered_sections for s in article['sections']]):
                 print('Article is in a filtered section and will not be included')
                 continue
+
+            article_count += 1
+            article['id'] = article_count # this is the primary key for the article table
+            article['filepath'] = path.replace('\\', '/') # backslashes break the copy_file
 
             # The keywords and sections both have separate tables and have a many-to-many
             # relationshop with the articles table. For each keyword / section in the
