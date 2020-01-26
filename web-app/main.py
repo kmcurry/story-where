@@ -98,6 +98,15 @@ def browse(page, length):
         headlines=h, 
         error_message=error_message)
 
+@app.route('/map/')
+def map_entities():
+    entities = db.get_entities(0)
+    error_message = None
+    return render_template(
+        'entities.html',
+        entities=entities, 
+        error_message=error_message)
+
 #vv########################### API ################################
 
 @app.route('/article/<int:article_id>')
