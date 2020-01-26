@@ -30,6 +30,12 @@ with open('nlentities.csv', 'w',  newline='') as nlentities_csvfile:
                     bad_files.append(path)
                     continue
 
+                doc_id = f.replace(".json", "")
+
+                if doc_id not in article_ids_by_doc_id:
+                    print('Skipping results because article was filtered')
+                    continue
+
                 entities = nlp_response['entities']
                 for entity in entities:
                     entity_count += 1
@@ -48,8 +54,6 @@ with open('nlentities.csv', 'w',  newline='') as nlentities_csvfile:
                             if 'type' in mention:
                                 mention_types.append(mention['type'])
 
-                    doc_id = f.replace(".json", "")
-
                     nlentity_writer.writerow([
                         entity_count,
                         entity['name'],
@@ -64,7 +68,7 @@ db.clear_nl_entities()
 
 
 print("Inserting NL Entities", entity_count)
-db.copy_from_file('nlentities', 'nlentities.csv', False)
+db.copy_from_file('f_nlentities', 'nlentities.csv', False)
 
 print("Insert complete")
 print("The following files could not be inserted because they were not formated correctly")
