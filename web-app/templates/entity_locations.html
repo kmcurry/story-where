@@ -1,0 +1,187 @@
+<!doctype html>
+<html>
+
+<style>
+    a {
+        color: blue !important;
+        cursor: pointer;
+    }
+
+    #headlineList {
+        margin-top: 40px;
+    }
+
+    #listTitle {
+        position: fixed;
+        background-color: white;
+        width: 100%;
+        top: 0px;
+        padding-top: 20px;
+    }
+
+    #map {
+        height: 100%;
+    }
+
+    #mapContainer {
+        height: 800px;
+        position: fixed;
+        left: 25%;
+    }
+
+    html,
+    body {
+        height: 100%;
+        margin: 10px;
+        padding: 10px;
+    }
+</style>
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<head>
+    <title>Browse Nature Language Entities</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+
+</head>
+
+<body>
+    <div class="row">
+        <div id="headlines" class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+            <div id="listTitle">
+                <h2>Entites (DRAFT)</h2>
+            </div>
+            <ol id="entitiesList" style="margin-top: 50px"></ol>
+        </div>
+        <div id="mapContainer" class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
+            <div id="map">
+            </div>
+        </div>
+
+    </div>
+    <script>
+        var map;
+
+        function appendEntity(entity, page) {
+            var entitiesList = document.getElementById("entitiesList");
+            var li = document.createElement("li");
+            var p = document.createElement("p");
+            var a = document.createElement("a");
+            var text = document.createTextNode(entity['entity']);
+            var small = document.createElement("small");
+            var smallText = document.createTextNode(entity['article_count'] + " articles");
+            console.log(entity);
+            var method = "mapArticle(" + entity['location']['lat'] + "," + entity['location']['lng'] + ")";
+            a.setAttribute("onclick", method);
+            a.appendChild(text);
+            small.appendChild(smallText);
+            p.appendChild(a);
+            p.appendChild(document.createElement("br"));
+            p.appendChild(small);
+            li.appendChild(p);
+            entitiesList.appendChild(li);
+        }
+
+        function getMoreEntities(page) {
+
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+
+                    var entities = JSON.parse(xhttp.responseText);
+                    entities.forEach(entity => appendEntity(entity, page))
+
+                }
+            };
+            xhttp.open("GET", "/entities/" + page, true);
+            xhttp.send();
+        }
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: {
+                    lat: 36.863,
+                    lng: -76.015
+                },
+                zoom: 8
+            });
+
+            getMoreEntities(0);
+        }
+
+        function mapArticle(articleId) {
+            console.log("Mapping Article ID: " + articleId);
+
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+
+                    var article = JSON.parse(xhttp.responseText);
+
+                    var locations = article.nl_entities.filter(nle => nle.type == "LOCATION" && nle.location != null);
+
+                    locations.forEach(location => mark(location))
+
+                }
+            };
+            xhttp.open("GET", "/article/" + articleId, true);
+            xhttp.send();
+        }
+
+        function mark(location) {
+            var myLatLng = {
+                lat: location.location.lat,
+                lng: location.location.lng
+            };
+
+            console.log(myLatLng);
+
+            var marker = new google.maps.Marker({
+                position: myLatLng,
+                map: map,
+                title: location.name
+            });
+
+            var contentString = '<div id="content">' +
+                '<div id="siteNotice">' +
+                '</div>' +
+                '<h1 id="firstHeading" class="firstHeading">'+ location.name + '</h1>' +
+                '<div id="bodyContent">' +
+                '<p><b>' + location.location.formatted_address + '</b></p>' +
+                '</div>' +
+                '</div>';
+
+            var infowindow = new google.maps.InfoWindow({
+                content: contentString
+            });
+
+
+            marker.addListener('click', function () {
+                infowindow.open(map, marker);
+            });
+
+        }
+
+        var numScrolls = 0;
+        $(window).scroll(function () {
+            if ($(window).scrollTop() == $(document).height() - $(window).height()) {
+                // ajax call get data from server and append to the div
+                getMoreEntities(++numScrolls);
+            }
+        });
+    </script>
+
+
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBUTbge6vBRkzguyuwbBSVT_2Wu_gLi9nQ&callback=initMap">
+    </script>
+
+
+</body>
+
+</html>

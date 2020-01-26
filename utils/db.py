@@ -13,18 +13,18 @@ from pprint import pprint
 
 Base = declarative_base()
 
-articles_sections_assoc_table = Table('articles_sections', Base.metadata,
-    Column('articles_id', Integer, ForeignKey('articles.id')),
-    Column('sections_id', Integer, ForeignKey('sections.id'))
+articles_sections_assoc_table = Table('f_articles_sections', Base.metadata,
+    Column('articles_id', Integer, ForeignKey('f_articles.id')),
+    Column('sections_id', Integer, ForeignKey('f_sections.id'))
 )
 
-articles_keywords_assoc_table = Table('articles_keywords', Base.metadata,
-    Column('articles_id', Integer, ForeignKey('articles.id')),
-    Column('keywords_id', Integer, ForeignKey('keywords.id'))
+articles_keywords_assoc_table = Table('f_articles_keywords', Base.metadata,
+    Column('articles_id', Integer, ForeignKey('f_articles.id')),
+    Column('keywords_id', Integer, ForeignKey('f_keywords.id'))
 )
 
 class Article(Base):
-    __tablename__ = 'articles'
+    __tablename__ = 'f_articles'
     id = Column(Integer, primary_key=True)
     filepath = Column(String)
     doc_id = Column(String)
@@ -52,7 +52,7 @@ class Article(Base):
         back_populates="article")
 
 class Section(Base):
-    __tablename__ = 'sections'
+    __tablename__ = 'f_sections'
     id = Column(Integer, primary_key=True)
     name = Column(String)
     articles = relationship(
@@ -61,7 +61,7 @@ class Section(Base):
         back_populates="sections")
 
 class Keyword(Base):
-    __tablename__ = 'keywords'
+    __tablename__ = 'f_keywords'
     id = Column(Integer, primary_key=True)
     name = Column(String)
     articles = relationship(
@@ -70,14 +70,14 @@ class Keyword(Base):
         back_populates="keywords")
 
 class NLEntity(Base):
-    __tablename__ = 'nlentities'
+    __tablename__ = 'f_nlentities'
     id = Column(Integer, primary_key=True)
     name = Column(String)
     type = Column(String)
     wiki = Column(String)
     salience = Column(Float)
     proper = Column(Boolean)
-    article_id = Column(Integer, ForeignKey('articles.id'))
+    article_id = Column(Integer, ForeignKey('f_articles.id'))
     article = relationship(
         "Article", 
         back_populates="nl_entities")

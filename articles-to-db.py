@@ -127,6 +127,15 @@ article_count = 0
 all_sections = {}
 all_keywords = {}
 
+# Get list of content sections to filter for
+# If an article is listed in one of these sections it will NOT be included in the database
+filtered_sections = []
+with open('filtered_sections.csv') as filtered_sections_file:
+    for l in filtered_sections_file.readlines():
+        section = l.rstrip()
+        if section is not "":
+            filtered_sections.append(section)
+
 # Open csv files which reflect database tables
 with open('articles.csv', 'w',  newline='') as articles_csvfile, \
      open('keywords.csv', 'w',  newline='') as keywords_csvfile, \
@@ -158,6 +167,11 @@ with open('articles.csv', 'w',  newline='') as articles_csvfile, \
             # Parse the xml and get the data we need
             xml = ET.parse(path).getroot()
             article = get_data_from_article()
+            
+            if any([s in filtered_sections for s in article['sections']]):
+                print('Article is in a filtered section and will not be included')
+                continue
+
             article_count += 1
             article['id'] = article_count # this is the primary key for the article table
             article['filepath'] = path.replace('\\', '/') # backslashes break the copy_file
@@ -191,16 +205,16 @@ with open('articles.csv', 'w',  newline='') as articles_csvfile, \
 # Call copy_from to upload data to each database
 
 print('Inserting sections', len(all_sections))
-db.copy_from_file('sections', 'sections.csv', False)
+db.copy_from_file('f_sections', 'sections.csv', False)
 
 print('Inserting keywords', len(all_keywords))
-db.copy_from_file('keywords', 'keywords.csv', False)
+db.copy_from_file('f_keywords', 'keywords.csv', False)
 
 print('Inserting articles', article_count)
-db.copy_from_file('articles', 'articles.csv', True)
+db.copy_from_file('f_articles', 'articles.csv', True)
 
 print('Inserting article-section associations')
-db.copy_from_file('articles_sections', 'articles_sections.csv', False)
+db.copy_from_file('f_articles_sections', 'articles_sections.csv', False)
 
 print('Inserting article-keyword associations')
-db.copy_from_file('articles_keywords', 'articles_keywords.csv', False)
+db.copy_from_file('f_articles_keywords', 'articles_keywords.csv', False)
