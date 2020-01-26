@@ -14,18 +14,18 @@ from marshmallow import Schema, fields
 
 Base = declarative_base()
 
-articles_sections_assoc_table = Table('articles_sections', Base.metadata,
-    Column('articles_id', Integer, ForeignKey('articles.id')),
-    Column('sections_id', Integer, ForeignKey('sections.id'))
+articles_sections_assoc_table = Table('f_articles_sections', Base.metadata,
+    Column('articles_id', Integer, ForeignKey('f_articles.id')),
+    Column('sections_id', Integer, ForeignKey('f_sections.id'))
 )
 
-articles_keywords_assoc_table = Table('articles_keywords', Base.metadata,
-    Column('articles_id', Integer, ForeignKey('articles.id')),
-    Column('keywords_id', Integer, ForeignKey('keywords.id'))
+articles_keywords_assoc_table = Table('f_articles_keywords', Base.metadata,
+    Column('articles_id', Integer, ForeignKey('f_articles.id')),
+    Column('keywords_id', Integer, ForeignKey('f_keywords.id'))
 )
 
 class Article(Base):
-    __tablename__ = 'articles'
+    __tablename__ = 'f_articles'
     id = Column(Integer, primary_key=True)
     filepath = Column(String)
     doc_id = Column(String)
@@ -73,7 +73,7 @@ class ArticleSchema(Schema):
     nl_entities = fields.List(fields.Nested(lambda: NLEntitySchema))
 
 class Section(Base):
-    __tablename__ = 'sections'
+    __tablename__ = 'f_sections'
     id = Column(Integer, primary_key=True)
     name = Column(String)
     articles = relationship(
@@ -86,7 +86,7 @@ class SectionSchema(Schema):
     name = fields.Str()
 
 class Keyword(Base):
-    __tablename__ = 'keywords'
+    __tablename__ = 'f_keywords'
     id = Column(Integer, primary_key=True)
     name = Column(String)
     articles = relationship(
@@ -99,14 +99,14 @@ class KeywordSchema(Schema):
     name = fields.Str()
 
 class NLEntity(Base):
-    __tablename__ = 'nlentities'
+    __tablename__ = 'f_nlentities'
     id = Column(Integer, primary_key=True)
     name = Column(String, ForeignKey('locations.address'))
     type = Column(String)
     wiki = Column(String)
     salience = Column(Float)
     proper = Column(Boolean)
-    article_id = Column(Integer, ForeignKey('articles.id'))
+    article_id = Column(Integer, ForeignKey('f_articles.id'))
     article = relationship(
         "Article", 
         back_populates="nl_entities")
@@ -293,7 +293,7 @@ class WebDatabase():
     def get_entities(self, page, length):
         entity_query = self.session \
             .query(NLEntity.name, func.count(NLEntity.article_id).label('entity_count'), func.array_agg(NLEntity.article_id)) \
-            .filter(NLEntity.proper, NLEntity.salience >= 0.1, NLEntity.type.in_( ("ORGANIZATION", "LOCATION") )) \
+            .filter(NLEntity.proper, NLEntity.salience >= 0.01, NLEntity.type.in_( ("ORGANIZATION", "LOCATION") )) \
             .group_by(NLEntity.name) \
             .order_by(desc('entity_count')) \
             .offset(page * length) \
