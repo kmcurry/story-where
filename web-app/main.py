@@ -116,10 +116,11 @@ def browse_entities():
 def get_article(article_id): 
     return jsonify(db.get_article(article_id))
 
-@app.route("/entities/", defaults={"page": 0})
-@app.route('/entities/<int:page>')
-def get_entities(page):
-    entities = db.get_entities(page)
+@app.route("/entities/", defaults={"page": 0, "length": 100})
+@app.route("/entities/<int:page>", defaults={"length": 100})
+@app.route('/entities/<int:page>/<int:length>')
+def get_entities(page, length):
+    entities = db.get_entities(page, length)
     return jsonify(entities)
 
 @app.route("/headlines/", defaults={"page": 0, "length": 100})
