@@ -161,10 +161,10 @@
                     ]
             });
 
-            // var heatmap = new google.maps.visualization.HeatmapLayer({
-            //     data: heatMapData
-            // });
-            // heatmap.setMap(map);
+            var heatmap = new google.maps.visualization.HeatmapLayer({
+                data: heatMapData
+            });
+            heatmap.setMap(map);
 
             getMoreEntities(0);
         }
@@ -177,7 +177,6 @@
             var text = document.createTextNode(entity['entity']);
             var small = document.createElement("small");
             var smallText = document.createTextNode(entity['article_count'] + " articles");
-            console.log(entity);
             // var method = "mapArticles(" + entity.article_ids + ")";
             // a.setAttribute("onclick", method);
             a.appendChild(text);
@@ -188,10 +187,10 @@
             li.appendChild(p);
             entitiesList.appendChild(li);
 
-            // heatMapData.push({
-            //         "location":new google.maps.LatLng( entity['location']['lat'],  entity['location']['lng']),
-            //         "weight": entity.article_count
-            //         });
+            heatMapData.push({
+                    "location":new google.maps.LatLng( entity['location']['lat'],  entity['location']['lng']),
+                    "weight": entity.article_count
+                    });
 
             mark(entity.location);
         }
@@ -222,13 +221,12 @@
                 }
                 
             };
-            xhttp.open("GET", "/entities/" + page, true);
+            xhttp.open("GET", "/entities/" + page + "/1000", true);
             xhttp.send();
         }
 
         function mapArticles(article_ids) {
-            console.log("Mapping Entity: " + article_ids);
-
+            
             var xhttp = new XMLHttpRequest();
             xhttp.onreadystatechange = function () {
                 if (this.readyState == 4 && this.status == 200) {
@@ -254,8 +252,6 @@
                 lat: location.lat,
                 lng: location.lng
             };
-
-            console.log(myLatLng);
 
             var marker = new google.maps.Marker({
                 position: myLatLng,
