@@ -371,3 +371,6 @@ class WebDatabase():
         proper_organizations = nl_entities_schema.dump(proper_organizations)
         
         return proper_organizations
+    
+    def get_sections(self):
+        return self.session.query(Section.name).all()
