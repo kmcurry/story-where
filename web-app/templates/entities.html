@@ -11,6 +11,13 @@
         margin-top: 40px;
     }
 
+    #filterPanel {
+        display:none;
+        margin-top:50px;
+        position: fixed;
+        background-color: white;
+    }
+
     #listTitle {
         position: fixed;
         background-color: white;
@@ -32,8 +39,8 @@
     html,
     body {
         height: 100%;
-        margin: 10px;
-        padding: 10px;
+        margin: 6px;
+        padding: 4px;
     }
 </style>
 
@@ -50,10 +57,27 @@
 </head>
 
 <body>
+    
     <div class="row">
         <div id="entities" class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
-            <div id="listTitle">
-                <h2>Entities (DRAFT)</h2>
+            <div id="listTitle" class="row">
+                <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+                    <h2>Entities</h2>
+                </div>
+                <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1">
+                    <button class="btn btn-primary">Filter</button>
+                </div>
+            </div>
+            <div id="filterPanel">
+                <div class="ui-widget">
+                    <label for="section-search">Sections:</label>
+                    <input id="section-search" style="width:100%">
+                </div>
+                <br/>
+                <div class="ui-widget">
+                    <label for="city-search">Cities:</label>
+                    <input id="city-search" style="width:100%">
+                </div>
             </div>
             <ol id="entitiesList" style="margin-top: 50px"></ol>
         </div>
@@ -67,6 +91,17 @@
 
         var heatMapData = null;
         var iconUrl = 'http://icons.iconarchive.com/icons/mad-science/arcade-saturdays/32/Dot-icon.png';
+
+        var availableCities = [
+            'Chesapeake',
+            'Hampton',
+            'Norfolk',
+            'Newport News',
+            'Portsmouth',
+            'Suffolk',
+            'Virginia Beach',
+            'Williamsburg'
+        ]
 
 
         function initMap() {
@@ -177,8 +212,8 @@
             var text = document.createTextNode(entity['entity']);
             var small = document.createElement("small");
             var smallText = document.createTextNode(entity['article_count'] + " articles");
-            // var method = "mapArticles(" + entity.article_ids + ")";
-            // a.setAttribute("onclick", method);
+            var method = "mapArticles('" + JSON.stringify(entity) + "')";
+            a.setAttribute("onclick", method);
             a.appendChild(text);
             small.appendChild(smallText);
             p.appendChild(a);
@@ -192,7 +227,7 @@
                     "weight": entity.article_count
                     });
 
-            mark(entity.location);
+            mark(entity.location, true);
         }
 
         function getMoreEntities(page) {
@@ -225,7 +260,11 @@
             xhttp.send();
         }
 
-        function mapArticles(article_ids) {
+        function mapArticles(entity) {
+            entity = JSON.parse(entity);
+            article_ids = entity['article_ids'];
+            
+            //console.log(article_ids);
             
             var xhttp = new XMLHttpRequest();
             xhttp.onreadystatechange = function () {
@@ -235,19 +274,21 @@
 
                     var locations = article.nl_entities.filter(nle => nle.type == "LOCATION" && nle.location != null);
 
-                    locations.forEach(location => mark(location))
+                    locations.forEach(location => mark(location.location, false))
 
                 }
+                console.log(this.status);
             };
 
             article_ids.forEach(function(articleId) {
-                xhttp.open("GET", "/article/" + articleId, true);
+                xhttp.open("GET", "/article/" + article_ids[0], true);
                 xhttp.send();
             });
 
         }
 
-        function mark(location) {
+        function mark(location, icon) {
+            console.log(location.lat + ", " + location.lng);
             var myLatLng = {
                 lat: location.lat,
                 lng: location.lng
@@ -256,13 +297,24 @@
             var marker = new google.maps.Marker({
                 position: myLatLng,
                 map: map,
-                icon: iconUrl
             });
+
+            if(icon) {
+                marker.setIcon(iconUrl);
+            }
 
         }
 
         function showArticles(entity) {
             console.log("Showing Articles for Entity: " + entity);
+        }
+
+        function transformArray(data) {
+            return data.map(function(datum) {
+                return datum.reduce(function(a, c) {
+                    return c
+                }, {})
+            })
         }
 
         var numScrolls = 0;
@@ -271,13 +323,32 @@
                 // ajax call get data from server and append to the div
                 getMoreEntities(++numScrolls)
             }
+        });	
+
+        $( "button" ).click(function() {
+            $( "#filterPanel" ).slideToggle( "slow" );
         });
+
+        $(document).ready( function() {
+            var availableSections = {{sections|tojson}};
+            availableSections = transformArray(availableSections); // API returns array or arrays, we need array of objs
+            $( "#section-search" ).autocomplete({
+                source: availableSections
+            });
+            $( "#city-search" ).autocomplete({
+                source: availableCities
+            });
+        } );
     </script>
 
 
     <script async defer
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBUTbge6vBRkzguyuwbBSVT_2Wu_gLi9nQ&callback=initMap&libraries=visualization">
     </script>
+
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+    <script async defer src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
 
 </body>
