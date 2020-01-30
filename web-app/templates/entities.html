@@ -1,59 +1,59 @@
 <!doctype html>
 <html>
 
-<style>
-    a {
-        color: blue !important;
-        cursor: pointer;
-    }
+    <head>
+        <title>Entities</title>
+        <meta name="viewport" content="initial-scale=1.0">
+        <meta charset="utf-8">
 
-    #entityList {
-        margin-top: 40px;
-    }
+    <style>
+        a {
+            color: blue !important;
+            cursor: pointer;
+        }
 
-    #filterPanel {
-        display:none;
-        margin-top:50px;
-        position: fixed;
-        background-color: white;
-    }
+        #entityList {
+            margin-top: 40px;
+        }
 
-    #listTitle {
-        position: fixed;
-        background-color: white;
-        width: 100%;
-        top: 0px;
-        padding-top: 20px;
-    }
+        #filterPanel {
+            display:none;
+            margin-top:50px;
+            position: fixed;
+            background-color: white;
+        }
 
-    #map {
-        height: 100%;
-    }
+        #listTitle {
+            position: fixed;
+            background-color: white;
+            width: 100%;
+            top: 0px;
+            padding-top: 20px;
+        }
 
-    #mapContainer {
-        height: 800px;
-        position: fixed;
-        left: 25%;
-    }
+        #map {
+            height: 100%;
+        }
 
-    html,
-    body {
-        height: 100%;
-        margin: 6px;
-        padding: 4px;
-    }
-</style>
+        #mapContainer {
+            height: 800px;
+            position: fixed;
+            left: 25%;
+        }
 
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        html,
+        body {
+            height: 100%;
+            margin: 6px;
+            padding: 4px;
+        }
+    </style>
 
-<script async defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
 
-<head>
-    <title>Entities</title>
-    <meta name="viewport" content="initial-scale=1.0">
-    <meta charset="utf-8">
 </head>
 
 <body>
@@ -86,6 +86,10 @@
             </div>
         </div>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
     <script>
         var map;
 
@@ -288,7 +292,7 @@
         }
 
         function mark(location, icon) {
-            console.log(location.lat + ", " + location.lng);
+            //console.log(location.lat + ", " + location.lng);
             var myLatLng = {
                 lat: location.lat,
                 lng: location.lng
@@ -332,15 +336,9 @@
         } );
     </script>
 
-
-    <script async defer
+    <script
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBUTbge6vBRkzguyuwbBSVT_2Wu_gLi9nQ&callback=initMap&libraries=visualization">
     </script>
-
-    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
-    <script async defer src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-
 
 </body>
 
