@@ -1,72 +1,134 @@
 <!doctype html>
 <html>
 
-<style>
-    a {
-        color: blue !important;
-        cursor: pointer;
-    }
+    <head>
+        <title>Entities</title>
+        <meta name="viewport" content="initial-scale=1.0">
+        <meta charset="utf-8">
 
-    #entityList {
-        margin-top: 40px;
-    }
+    <style>
+        a {
+            color: blue !important;
+            cursor: pointer;
+        }
 
-    #listTitle {
-        position: fixed;
-        background-color: white;
-        width: 100%;
-        top: 0px;
-        padding-top: 20px;
-    }
+        #entityList {
+            margin-top: 40px;
+        }
 
-    #map {
-        height: 100%;
-    }
+        #filterPanel {
+            display:none;
+            margin-top:50px;
+            position: fixed;
+            background-color: white;
+        }
 
-    #mapContainer {
-        height: 800px;
-        position: fixed;
-        left: 25%;
-    }
+        #listTitle {
+            position: fixed;
+            background-color: white;
+            width: 100%;
+            top: 0px;
+            padding-top: 20px;
+        }
 
-    html,
-    body {
-        height: 100%;
-        margin: 10px;
-        padding: 10px;
-    }
-</style>
+        #map {
+            height: 100%;
+        }
 
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        #mapContainer {
+            height: 800px;
+            position: fixed;
+            left: 25%;
+        }
 
-<script async defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        html,
+        body {
+            height: 100%;
+            margin: 6px;
+            padding: 4px;
+        }
+    </style>
 
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
-<head>
-    <title>Entities</title>
-    <meta name="viewport" content="initial-scale=1.0">
-    <meta charset="utf-8">
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+
 </head>
 
 <body>
+    
     <div class="row">
         <div id="entities" class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
-            <div id="listTitle">
-                <h2>Entities (DRAFT)</h2>
+            <div id="listTitle" class="row">
+                <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+                    <h2>Entities</h2>
+                </div>
+                <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1">
+                    <button id="filter-btn" class="btn btn-primary">Filter</button>
+                </div>
+            </div>
+            <div id="filterPanel">
+                <div class="ui-widget">
+                    <label for="section-search">Sections:</label>
+                    <input id="section-search" style="width:100%">
+                </div>
+                <br/>
+                <div class="ui-widget">
+                    <label for="city-search">Cities:</label>
+                    <input id="city-search" style="width:100%">
+                </div>
             </div>
             <ol id="entitiesList" style="margin-top: 50px"></ol>
         </div>
+
+        <div id="article" class="col-xs-3 col-sm-3 col-md-3 col-lg-3" style="display:none">
+            <div class="row">
+                <div class="col-8">
+                    <h2 id="cur-entity-name"></h2>
+                </div>
+                <div class="col-4">
+                    <button id="article-back-btn" class="btn btn-primary">Back</button>
+                </div>
+            </div>
+            <div class="row">
+                    <div class="col-8">
+                        <h4>Article <span id="cur-num-article"></span> of <span id="total-num-articles"></span></h2>
+                    </div>
+                    <div class="col-4">
+                        <button id="article-next-btn" class="btn btn-primary">Next</button>
+                    </div>
+                </div>
+            <h5 id="article-title"></h5>
+            <div id="article-date" class="text-muted"></div>
+            <div id="article-body"></div>
+        </div>
+
         <div id="mapContainer" class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
             <div id="map">
             </div>
         </div>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
     <script>
         var map;
 
         var heatMapData = null;
         var iconUrl = 'http://icons.iconarchive.com/icons/mad-science/arcade-saturdays/32/Dot-icon.png';
+
+        var availableCities = [
+            'Chesapeake',
+            'Hampton',
+            'Norfolk',
+            'Newport News',
+            'Portsmouth',
+            'Suffolk',
+            'Virginia Beach',
+            'Williamsburg'
+        ]
 
 
         function initMap() {
@@ -177,8 +239,8 @@
             var text = document.createTextNode(entity['entity']);
             var small = document.createElement("small");
             var smallText = document.createTextNode(entity['article_count'] + " articles");
-            // var method = "mapArticles(" + entity.article_ids + ")";
-            // a.setAttribute("onclick", method);
+            var method = "mapArticles('" + JSON.stringify(entity) + "')";
+            a.setAttribute("onclick", method);
             a.appendChild(text);
             small.appendChild(smallText);
             p.appendChild(a);
@@ -192,7 +254,7 @@
                     "weight": entity.article_count
                     });
 
-            mark(entity.location);
+            mark(entity.location, true);
         }
 
         function getMoreEntities(page) {
@@ -225,29 +287,43 @@
             xhttp.send();
         }
 
-        function mapArticles(article_ids) {
-            
-            var xhttp = new XMLHttpRequest();
-            xhttp.onreadystatechange = function () {
-                if (this.readyState == 4 && this.status == 200) {
+        function mapArticle(articleId) {
+            $("#cur-num-article").html(curArticle + 1);
+            $("#article-title").html("LOADING...");
+            $("#article-date").html("");
+            $("#article-body").html("");
 
-                    var article = JSON.parse(xhttp.responseText);
-
+            $.get("/article/" + articleId)
+                .done(function(article) {
                     var locations = article.nl_entities.filter(nle => nle.type == "LOCATION" && nle.location != null);
-
-                    locations.forEach(location => mark(location))
-
-                }
-            };
-
-            article_ids.forEach(function(articleId) {
-                xhttp.open("GET", "/article/" + articleId, true);
-                xhttp.send();
-            });
-
+                    locations.forEach(location => mark(location.location, false));
+                    
+                    $("#article-title").html(article.headline);
+                    $("#article-date").html(article.release_date);
+                    $("#article-body").html(article.body.replace(/\|/g,'<br>'));
+                });
         }
 
-        function mark(location) {
+        var curArticle = -1;
+        var articleIds = [];
+
+        function mapArticles(entity) {
+            entity = JSON.parse(entity);
+            $("#cur-entity-name").html(entity.entity);
+
+            articleIds = entity['article_ids'];
+            curArticle = -1;
+            $("#total-num-articles").html(articleIds.length);
+
+            $("#entities").hide();
+            $("#article").show();
+
+            curArticle += 1;
+            mapArticle(articleIds[curArticle]);
+        }
+
+        function mark(location, icon) {
+            //console.log(location.lat + ", " + location.lng);
             var myLatLng = {
                 lat: location.lat,
                 lng: location.lng
@@ -256,8 +332,11 @@
             var marker = new google.maps.Marker({
                 position: myLatLng,
                 map: map,
-                icon: iconUrl
             });
+
+            if(icon) {
+                marker.setIcon(iconUrl);
+            }
 
         }
 
@@ -271,14 +350,36 @@
                 // ajax call get data from server and append to the div
                 getMoreEntities(++numScrolls)
             }
+        });	
+
+        $( "#filter-btn" ).click(function() {
+            $( "#filterPanel" ).slideToggle( "slow" );
         });
+
+        $(document).ready( function() {
+            var availableSections = {{sections|tojson}};
+            $( "#section-search" ).autocomplete({
+                source: availableSections
+            });
+            $( "#city-search" ).autocomplete({
+                source: availableCities
+            });
+
+            $("#article-back-btn").click(function() {
+                $("#article").hide();
+                $("#entities").show();
+            });
+
+            $("#article-next-btn").click(function() {
+                curArticle += 1;
+                mapArticle(articleIds[curArticle]);
+            });
+        } );
     </script>
 
-
-    <script async defer
+    <script
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBUTbge6vBRkzguyuwbBSVT_2Wu_gLi9nQ&callback=initMap&libraries=visualization">
     </script>
-
 
 </body>
 

@@ -371,3 +371,9 @@ class WebDatabase():
         proper_organizations = nl_entities_schema.dump(proper_organizations)
         
         return proper_organizations
+    
+    def get_sections(self):
+        # The query returns a list of tuples
+        # i.e. [(name_1,) , (name_2,) , (name_3,)]
+        section_names = self.session.query(Section.name).all()
+        return sorted([s for (s, ) in section_names])
