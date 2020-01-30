@@ -102,6 +102,7 @@ def browse(page, length):
 @app.route('/map/')
 def map_entities():
     sections = db.get_sections()
+    print(sections)
     return render_template(
         'entities.html',
         sections=sections)

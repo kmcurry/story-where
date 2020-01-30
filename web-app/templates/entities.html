@@ -309,14 +309,6 @@
             console.log("Showing Articles for Entity: " + entity);
         }
 
-        function transformArray(data) {
-            return data.map(function(datum) {
-                return datum.reduce(function(a, c) {
-                    return c
-                }, {})
-            })
-        }
-
         var numScrolls = 0;
         $(window).scroll(function () {
             if ($(window).scrollTop() == $(document).height() - $(window).height()) {
@@ -331,7 +323,6 @@
 
         $(document).ready( function() {
             var availableSections = {{sections|tojson}};
-            availableSections = transformArray(availableSections); // API returns array or arrays, we need array of objs
             $( "#section-search" ).autocomplete({
                 source: availableSections
             });
