@@ -65,7 +65,7 @@
                     <h2>Entities</h2>
                 </div>
                 <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1">
-                    <button class="btn btn-primary">Filter</button>
+                    <button id="filter-btn" class="btn btn-primary">Filter</button>
                 </div>
             </div>
             <div id="filterPanel">
@@ -81,6 +81,29 @@
             </div>
             <ol id="entitiesList" style="margin-top: 50px"></ol>
         </div>
+
+        <div id="article" class="col-xs-3 col-sm-3 col-md-3 col-lg-3" style="display:none">
+            <div class="row">
+                <div class="col-8">
+                    <h2 id="cur-entity-name"></h2>
+                </div>
+                <div class="col-4">
+                    <button id="article-back-btn" class="btn btn-primary">Back</button>
+                </div>
+            </div>
+            <div class="row">
+                    <div class="col-8">
+                        <h4>Article <span id="cur-num-article"></span> of <span id="total-num-articles"></span></h2>
+                    </div>
+                    <div class="col-4">
+                        <button id="article-next-btn" class="btn btn-primary">Next</button>
+                    </div>
+                </div>
+            <h5 id="article-title"></h5>
+            <div id="article-date" class="text-muted"></div>
+            <div id="article-body"></div>
+        </div>
+
         <div id="mapContainer" class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
             <div id="map">
             </div>
@@ -264,31 +287,39 @@
             xhttp.send();
         }
 
+        function mapArticle(articleId) {
+            $("#cur-num-article").html(curArticle + 1);
+            $("#article-title").html("LOADING...");
+            $("#article-date").html("");
+            $("#article-body").html("");
+
+            $.get("/article/" + articleId)
+                .done(function(article) {
+                    var locations = article.nl_entities.filter(nle => nle.type == "LOCATION" && nle.location != null);
+                    locations.forEach(location => mark(location.location, false));
+                    
+                    $("#article-title").html(article.headline);
+                    $("#article-date").html(article.release_date);
+                    $("#article-body").html(article.body.replace(/\|/g,'<br>'));
+                });
+        }
+
+        var curArticle = -1;
+        var articleIds = [];
+
         function mapArticles(entity) {
             entity = JSON.parse(entity);
-            article_ids = entity['article_ids'];
-            
-            //console.log(article_ids);
-            
-            var xhttp = new XMLHttpRequest();
-            xhttp.onreadystatechange = function () {
-                if (this.readyState == 4 && this.status == 200) {
+            $("#cur-entity-name").html(entity.entity);
 
-                    var article = JSON.parse(xhttp.responseText);
+            articleIds = entity['article_ids'];
+            curArticle = -1;
+            $("#total-num-articles").html(articleIds.length);
 
-                    var locations = article.nl_entities.filter(nle => nle.type == "LOCATION" && nle.location != null);
+            $("#entities").hide();
+            $("#article").show();
 
-                    locations.forEach(location => mark(location.location, false))
-
-                }
-                console.log(this.status);
-            };
-
-            article_ids.forEach(function(articleId) {
-                xhttp.open("GET", "/article/" + article_ids[0], true);
-                xhttp.send();
-            });
-
+            curArticle += 1;
+            mapArticle(articleIds[curArticle]);
         }
 
         function mark(location, icon) {
@@ -321,7 +352,7 @@
             }
         });	
 
-        $( "button" ).click(function() {
+        $( "#filter-btn" ).click(function() {
             $( "#filterPanel" ).slideToggle( "slow" );
         });
 
@@ -332,6 +363,16 @@
             });
             $( "#city-search" ).autocomplete({
                 source: availableCities
+            });
+
+            $("#article-back-btn").click(function() {
+                $("#article").hide();
+                $("#entities").show();
+            });
+
+            $("#article-next-btn").click(function() {
+                curArticle += 1;
+                mapArticle(articleIds[curArticle]);
             });
         } );
     </script>
