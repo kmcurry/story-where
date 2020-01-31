@@ -102,7 +102,6 @@ def browse(page, length):
 @app.route('/map/')
 def map_entities():
     sections = db.get_sections()
-    print(sections)
     return render_template(
         'entities.html',
         sections=sections)
@@ -113,7 +112,7 @@ def browse_entities():
         'entity_locations.html')
 
 
-#vv########################### API ################################
+#vv########################### API endpoints by alpha ################################
 
 @app.route('/article/<int:article_id>')
 def get_article(article_id): 
@@ -133,6 +132,12 @@ def get_headlines(page, length):
     headlines = db.get_headlines(page, length)
     return jsonify(headlines)
 
+@app.route("/info/", defaults={"salience": 0.1})
+@app.route("/info/<float:salience>")
+def get_info(salience):
+    info = db.get_info(salience)
+    return jsonify(info)
+
 @app.route("/proper-locations/", defaults={"salience": 0.1, "page": 0, "length": 100})
 @app.route("/proper-locations/<float:salience>", defaults={"page": 0, "length": 100})
 @app.route("/proper-locations/<float:salience>/<int:page>/", defaults={"length": 100})
@@ -149,12 +154,10 @@ def get_proper_organizations(salience, page, length):
     proper_organizations = db.get_proper_organizations(salience, page, length)
     return jsonify(proper_organizations)
 
-@app.route("/info/", defaults={"salience": 0.1})
-@app.route("/info/<float:salience>")
-def get_info(salience):
-    info = db.get_info(salience)
-    return jsonify(info)
-
+@app.route("/sections")
+def get_sections():
+    sections = db.get_sections()
+    return jsonify(sections)
 
 #vv########################### MAIN ################################
 
