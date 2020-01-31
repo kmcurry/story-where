@@ -7,7 +7,7 @@ from sqlalchemy import (create_engine, Boolean, Column,
                         Table, ForeignKey, Index, distinct)
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship, joinedload
+from sqlalchemy.orm import sessionmaker, relationship, joinedload, defaultload
 from sqlalchemy.pool import NullPool
 from pprint import pprint
 from marshmallow import Schema, fields
@@ -283,7 +283,10 @@ class WebDatabase():
         self.session = sessionmaker(bind=self.engine)()
     
     def get_article(self, article_id):
-        article_entity = self.session.query(Article).get(article_id)
+        article_entity = self.session.query(Article) \
+            .options(
+                defaultload(Article.nl_entities).subqueryload(NLEntity.location),
+            ).get(article_id)
 
         article_schema = ArticleSchema()
         article = article_schema.dump(article_entity)
