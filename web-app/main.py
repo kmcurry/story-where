@@ -106,11 +106,6 @@ def map_entities():
         'entities.html',
         sections=sections)
 
-@app.route("/browse_entities/")
-def browse_entities():
-    return render_template(
-        'entity_locations.html')
-
 
 #vv########################### API endpoints by alpha ################################
 
