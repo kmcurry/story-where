@@ -98,7 +98,7 @@
                 </div>
             </div>
             <div class="row m-1">
-                <div><h5 id="article-title"></h5></div>
+                <h5 style="width: 100%" id="article-title"></h5>
                 <div id="article-date" class="text-muted"></div>
             </div>
             <div class="row">
@@ -106,17 +106,21 @@
                     <div id="article-body"></div>
                 </div>
                 <div class="col-4">
+                    <div id="article-locations">
+                        <h5>Locations</h5>
+                        <div id="article-locations-list"></div>
+                    </div>
                     <div id="article-entities">
-                        <h5>Entities</h5>
-                        <ol id="article-entities-list"></ol>
+                        <h5>Other Entities</h5>
+                        <div id="article-entities-list"></div>
                     </div>
                     <div id="article-sections">
                         <h5>Sections</h5>
-                        <ol id="article-sections-list"></ol>
+                        <div id="article-sections-list"></div>
                     </div>
                     <div id="article-keywords">
                         <h5>Keywords</h5>
-                        <ol id="article-keywords-list"></ol>
+                        <div id="article-keywords-list"></div>
                     </div>
                 </div>
             </div>
@@ -313,6 +317,8 @@
             $("#article-title").html("LOADING...");
             $("#article-date").html("");
             $("#article-body").html("");
+            $("#article-locations-list").html("");
+            $("#article-entities-list").html("");
 
             $.get("/article/" + articleId)
                 .done(function(article) {
@@ -323,7 +329,14 @@
                     $("#article-date").html(article.release_date);
                     $("#article-body").html(article.body.replace(/\|/g,'<br>'));
 
-                    article.nl_entities.forEach(entity=> $("#article-entities-list").append("<li>" + entity.name + "</li>"));
+                    article.nl_entities.forEach(entity => {
+                        var list = "";
+                        if (entity.location)
+                            list  = "#article-locations-list";
+                        else
+                            list = "#article-entities-list";
+                        $(list).append("<div>" + entity.name + "</div><div class=\"text-muted small mb-1\">" + entity.type + " - " + (entity.salience.toString().substring(0, 5)) + "</div>");
+                    });
                 });
         }
 
