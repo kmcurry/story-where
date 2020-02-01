@@ -37,8 +37,6 @@
 
         #mapContainer {
             height: 800px;
-            position: fixed;
-            left: 25%;
         }
 
         html,
@@ -59,12 +57,12 @@
 <body>
     
     <div class="row">
-        <div id="entities" class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+        <div id="entities" class="col-3">
             <div id="listTitle" class="row">
-                <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+                <div class="col-2">
                     <h2>Entities</h2>
                 </div>
-                <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1">
+                <div class="col-1">
                     <button id="filter-btn" class="btn btn-primary">Filter</button>
                 </div>
             </div>
@@ -82,7 +80,7 @@
             <ol id="entitiesList" style="margin-top: 50px"></ol>
         </div>
 
-        <div id="article" class="col-xs-3 col-sm-3 col-md-3 col-lg-3" style="display:none">
+        <div id="article" class="col-5" style="display:none">
             <div class="row">
                 <div class="col-8">
                     <h2 id="cur-entity-name"></h2>
@@ -92,19 +90,39 @@
                 </div>
             </div>
             <div class="row">
-                    <div class="col-8">
-                        <h4>Article <span id="cur-num-article"></span> of <span id="total-num-articles"></span></h2>
+                <div class="col-8">
+                    <h4>Article <span id="cur-num-article"></span> of <span id="total-num-articles"></span></h2>
+                </div>
+                <div class="col-4">
+                    <button id="article-next-btn" class="btn btn-primary">Next</button>
+                </div>
+            </div>
+            <div class="row m-1">
+                <div><h5 id="article-title"></h5></div>
+                <div id="article-date" class="text-muted"></div>
+            </div>
+            <div class="row">
+                <div class="col-8">
+                    <div id="article-body"></div>
+                </div>
+                <div class="col-4">
+                    <div id="article-entities">
+                        <h5>Entities</h5>
+                        <ol id="article-entities-list"></ol>
                     </div>
-                    <div class="col-4">
-                        <button id="article-next-btn" class="btn btn-primary">Next</button>
+                    <div id="article-sections">
+                        <h5>Sections</h5>
+                        <ol id="article-sections-list"></ol>
+                    </div>
+                    <div id="article-keywords">
+                        <h5>Keywords</h5>
+                        <ol id="article-keywords-list"></ol>
                     </div>
                 </div>
-            <h5 id="article-title"></h5>
-            <div id="article-date" class="text-muted"></div>
-            <div id="article-body"></div>
+            </div>
         </div>
 
-        <div id="mapContainer" class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
+        <div id="mapContainer" class="col">
             <div id="map">
             </div>
         </div>
@@ -304,6 +322,8 @@
                     $("#article-title").html(article.headline);
                     $("#article-date").html(article.release_date);
                     $("#article-body").html(article.body.replace(/\|/g,'<br>'));
+
+                    article.nl_entities.forEach(entity=> $("#article-entities-list").append("<li>" + entity.name + "</li>"));
                 });
         }
 
