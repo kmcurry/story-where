@@ -140,7 +140,6 @@
             map = new google.maps.Map(document.getElementById('map'), {
                 center: hampton_roads,
                 zoom: 9,
-                icon: iconUrl,
                 styles: [
                         {elementType: 'geometry', stylers: [{color: '#242f3e'}]},
                         {elementType: 'labels.text.stroke', stylers: [{color: '#242f3e'}]},
@@ -224,7 +223,9 @@
             });
 
             var heatmap = new google.maps.visualization.HeatmapLayer({
-                data: heatMapData
+                data: heatMapData,
+                radius: 20,
+                opacity: 0.8
             });
             heatmap.setMap(map);
 
@@ -249,12 +250,14 @@
             li.appendChild(p);
             entitiesList.appendChild(li);
 
-            heatMapData.push({
-                    "location":new google.maps.LatLng( entity['location']['lat'],  entity['location']['lng']),
-                    "weight": entity.article_count
-                    });
+            if(entity['location']['lat'] > 36.5 && entity['location']['lat'] < 37.2 && entity['location']['lng'] > -77 && entity['location']['lng'] < -75.5)
+            {
+                heatMapData.push({
+                    "location":new google.maps.LatLng( entity['location']['lat'],  entity['location']['lng'])
+                });
+            }
 
-            mark(entity.location, true);
+            mark(entity.location, entity.entity, true);
         }
 
         function getMoreEntities(page) {
@@ -296,7 +299,7 @@
             $.get("/article/" + articleId)
                 .done(function(article) {
                     var locations = article.nl_entities.filter(nle => nle.type == "LOCATION" && nle.location != null);
-                    locations.forEach(location => mark(location.location, false));
+                    locations.forEach(location => mark(location.location, location.address, false));
                     
                     $("#article-title").html(article.headline);
                     $("#article-date").html(article.release_date);
@@ -322,7 +325,7 @@
             mapArticle(articleIds[curArticle]);
         }
 
-        function mark(location, icon) {
+        function mark(location, title, icon) {
             //console.log(location.lat + ", " + location.lng);
             var myLatLng = {
                 lat: location.lat,
@@ -332,10 +335,19 @@
             var marker = new google.maps.Marker({
                 position: myLatLng,
                 map: map,
+                title: title
             });
 
             if(icon) {
-                marker.setIcon(iconUrl);
+                marker.setIcon({
+                    path: google.maps.SymbolPath.CIRCLE,
+                    fillColor: '#00F',
+                    fillOpacity: 0.8,
+                    strokeColor: '#00A',
+                    strokeOpacity: 1,
+                    strokeWeight: 1,
+                    scale: 3
+                });
             }
 
         }
