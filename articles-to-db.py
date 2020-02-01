@@ -136,6 +136,29 @@ with open('filtered_sections.csv') as filtered_sections_file:
         if section is not "":
             filtered_sections.append(section)
 
+filtered_headlines = [
+    "Fun to Do",
+    "events from",
+    "Down the Road",
+    "honors & awards",
+    "honors for",
+    "Calendar for",
+    "a list of",
+    "pets that need a home",
+    "Thrifty Thursday",
+    "bzday",
+    "Horoscope",
+    "Sports lineup",
+    "day lineup",
+    "day's lineup",
+    "night lineup",
+    "C1 Refer"
+]
+
+filtered_exact_headlines = [
+    "lineup"
+]
+
 # Open csv files which reflect database tables
 with open('articles.csv', 'w',  newline='') as articles_csvfile, \
      open('keywords.csv', 'w',  newline='') as keywords_csvfile, \
@@ -170,6 +193,14 @@ with open('articles.csv', 'w',  newline='') as articles_csvfile, \
             
             if any([s in filtered_sections for s in article['sections']]):
                 print('Article is in a filtered section and will not be included')
+                continue
+                
+            if any([h in article['headline'] for h in filtered_headlines]):
+                print('Article has a filtered headline and will not be included')
+                continue
+            
+            if any([h == article['headline'] for h in filtered_exact_headlines]):
+                print('Article has a filtered headline and will not be included')
                 continue
 
             article_count += 1
