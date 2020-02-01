@@ -38,6 +38,9 @@ with open('nlentities.csv', 'w',  newline='') as nlentities_csvfile:
 
                 entities = nlp_response['entities']
                 for entity in entities:
+                    if entity['type'] == 'NUMBER':
+                        continue
+                    
                     entity_count += 1
 
                     wiki = None
