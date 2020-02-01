@@ -1,5 +1,6 @@
 articles/*
 nlp_results/*
+nlp_results_archive/*
 geocode_results/*
 *.csv
 .DS_Store
