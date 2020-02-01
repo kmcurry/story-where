@@ -378,5 +378,9 @@ class WebDatabase():
     def get_sections(self):
         # The query returns a list of tuples
         # i.e. [(name_1,) , (name_2,) , (name_3,)]
-        section_names = self.session.query(Section.name).all()
+        # TODO: fix hardcoded sections
+        section_names = self.session \
+            .query(Section.name) \
+            .filter(~Section.name.contains('distinction'), ~Section.name.contains('vagrowler'), ~Section.name.contains('vow-bride')) \
+            .all()
         return sorted([s for (s, ) in section_names])
