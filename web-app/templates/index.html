@@ -29,10 +29,32 @@
   </script>
 
   <script>
+    var getUrlParameter = function getUrlParameter(sParam) {
+        var sPageURL = window.location.search.substring(1),
+            sURLVariables = sPageURL.split('&'),
+            sParameterName,
+            i;
+
+        for (i = 0; i < sURLVariables.length; i++) {
+            sParameterName = sURLVariables[i].split('=');
+
+            if (sParameterName[0] === sParam) {
+                return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+            }
+        }
+    };
+
     if (typeof firebase === 'undefined') {
       const msg = "Please paste the Firebase initialization snippet into index.html. See https://console.firebase.google.com > Overview > Add Firebase to your web app.";
       console.log(msg);
       alert(msg);
+    } else {
+      var redirectUrl = getUrlParameter('redirect');
+      if (redirectUrl) {
+        firebase.auth().currentUser.getIdToken(true);
+        console.log(firebase.auth().currentUser.toJSON());
+        window.location = redirectUrl;
+      }
     }
   </script>
   <!-- [START gae_python37_auth_include_firebaseui] -->
@@ -46,7 +68,7 @@
 <body>
 
 <!-- [START gae_python37_auth_firebase_html] -->
-<h1>Datastore and Firebase Auth Example</h1>
+<h1>Story Where Login</h1>
 
 <div id="firebaseui-auth-container"></div>
 
