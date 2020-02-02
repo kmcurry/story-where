@@ -52,25 +52,16 @@ def before_request():
     id_token = request.cookies.get("token")
 
     if not id_token:
-        if request.endpoint.startswith('api'):
-            return jsonify({'error': "User not logged in"})
-        else:
-            return redirect('/?redirect=' + request.path)
+        return jsonify({'error': "User not logged in"})
 
     try:
         claims = google.oauth2.id_token.verify_firebase_token(
             id_token, firebase_request_adapter)
         if claims['email'] not in allowed_emails:
-            if request.endpoint.startswith('api'):
-                return jsonify({'error': "User not allowed"})
-            else:
-                return redirect('/?not-allowed=true')
+            return jsonify({'error': "User not allowed"})
     except ValueError as exc:
         error_message = str(exc)
-        if request.endpoint.startswith('api'):
-            return jsonify({'error': error_message})
-        else:
-            return redirect('/?redirect=' + request.path)
+        return jsonify({'error': error_message})
 
 #vv########################### Pages ################################
 
