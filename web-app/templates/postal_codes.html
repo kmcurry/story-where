@@ -122,6 +122,11 @@
 
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
 
+    <script>
+        var mapbox_key = {{ mapbox_key | tojson }};
+        var city = {{ city | tojson }};
+    </script>
+
 </head>
 
 <body>
@@ -187,7 +192,7 @@
         });
 
         $(document).ready( function() {
-
+            loadBoundary(city);
         } );
     </script>
 
@@ -201,6 +206,7 @@
     <script src="https://unpkg.com/esri-leaflet@2.1.0/dist/esri-leaflet.js",
     integrity="sha512-Tojl3UMd387f6DdAJlo+fKfJZiP55fYT+6Y58yKbHydnueOdSFOxrgLPuUxm7VW1szEt3hZVwv3V2sSUCuT35w==",
     crossorigin=""></script>
+    <script src="/static/gis.js"></script>
     <script src="/static/map_postal_codes.js"></script>
     
 
