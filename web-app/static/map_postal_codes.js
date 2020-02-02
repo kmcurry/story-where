@@ -1,11 +1,7 @@
-var mapbox_key = $("#mapbox_key").val();;
 var map = L.map("map").setView([36.6782395,-76.0781193], 10); // TODO: hardcoded
 
 
 var postal_code_boundary = null;
-
-// var data = $("#data").val();
-// data = JSON.parse(data);
 
 
 function getColor(d) {
@@ -34,7 +30,7 @@ function style(feature) {
     };
 }
 
-L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=' + mapbox_key, {
+L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=\'' + mapbox_key + '\'', {
     id: 'mapbox.light'
 }).addTo(map);
 
@@ -67,9 +63,12 @@ info.onAdd = function (map) {
 
 // method that we will use to update the control based on feature properties passed
 info.update = function (props) {
-    var count = props && props.count ? props.count : 0;
+    if (!props) return;
+
+    var count = props.count ? props.count : 0;
+    var zip = props.ZIP_CODE ? props.ZIP_CODE : props.ZIP
     this._div.innerHTML = '<h4>Articles by Postal Code</h4>' +  (props ?
-        '<b>Postal Code: ' + props.ZIP_CODE + '<br />' + count + ' articles</b>'
+        '<b>Postal Code: ' + zip + '<br />' + count + ' articles</b>'
         : '');
 };
 
@@ -112,7 +111,7 @@ var getCountByPostalCode = function(city) {
    
     console.log("Getting count for: " + city);
     return new Promise((resolve, reject) => {
-        d3.request("http://localhost:8080/api/postal-codes/" + city)
+        d3.request("http://localhost:8080/api/postal-codes/" + city) // TODO: hardcoded URL
         .mimeType("application/json")
         .response(function (xhr) {
           return JSON.parse(xhr.responseText);
@@ -131,32 +130,33 @@ var getCountByPostalCode = function(city) {
   
 }
 
-$.ajax({
-    dataType: "json",
-    //url: "https://gis.data.vbgov.com/datasets/759ad66064974eab9a556d3a90efa1a1_23.geojson", // TODO: hard coded
-    url: "https://opendata.arcgis.com/datasets/82ada480c5344220b2788154955ce5f0_1.geojson",
-    success: function (data) {
+var loadBoundary = function(city) {
+    console.log("Loading Boundary for: " + city);
+    var city_ = city.replace(' ', '');
+    console.log(gis[city_].postal_codes);
 
-        var city = "Virginia Beach" // TODO: hard coded
-        getCountByPostalCode(city).then(function (counts) {
-            if (counts) {
-                //console.log(data);
-
-                data.features.forEach(function (feature, index) {
-                    var articlesInPostalCode = counts.map(function(count) {
-                        //console.log(count[1]);
-                        return count[1];
-                    })
-                    //console.log(articlesInPostalCode);
-                    feature.properties.count = articlesInPostalCode[index];
-                });
-                
-                postal_code_boundary = new L.geoJson(data, {
-                    style: style,
-                    onEachFeature: onEachFeature
-                });
-                postal_code_boundary.addTo(map);
-            }
-        });
-    }
-});
+    $.ajax({
+        dataType: "json",
+        url: gis[city_].postal_codes,
+        success: function (data) {
+    
+            getCountByPostalCode(city).then(function (counts) {
+                if (counts) {
+                    console.log(counts)
+                    data.features.forEach(function (feature, index) {
+                        var articlesInPostalCode = counts.map(function(count) {
+                            return count[1];
+                        })
+                        feature.properties.count = articlesInPostalCode[index];
+                    });
+                    
+                    postal_code_boundary = new L.geoJson(data, {
+                        style: style,
+                        onEachFeature: onEachFeature
+                    });
+                    postal_code_boundary.addTo(map);
+                }
+            });
+        }
+    });
+}
