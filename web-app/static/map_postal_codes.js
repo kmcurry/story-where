@@ -111,7 +111,7 @@ var getCountByPostalCode = function(city) {
    
     console.log("Getting count for: " + city);
     return new Promise((resolve, reject) => {
-        d3.request("http://localhost:8080/api/postal-codes/" + city) // TODO: hardcoded URL
+        d3.request("/api/postal-codes/" + city) // TODO: hardcoded URL
         .mimeType("application/json")
         .response(function (xhr) {
           return JSON.parse(xhr.responseText);
