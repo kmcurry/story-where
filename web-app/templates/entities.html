@@ -156,6 +156,7 @@
         function initMap() {
 
             heatMapData = new google.maps.MVCArray([]);
+            infowindow = new google.maps.InfoWindow();
 
             var hampton_roads = new google.maps.LatLng(36.6, -76.3637);
 
@@ -279,7 +280,7 @@
                 });
             }
 
-            mark(entity.location, entity.entity, true);
+            //mark(entity.location, entity.entity, true);
         }
 
         function getMoreEntities(page) {
@@ -312,6 +313,16 @@
             xhttp.send();
         }
 
+        var articleMarkers = [];
+        var infowindow;
+
+        function getInfoWindowClickHandler(marker, location) {
+            return function() {
+                infowindow.setContent(location.name);
+                infowindow.open(map, marker);
+            }
+        }
+
         function mapArticle(articleId) {
             $("#cur-num-article").html(curArticle + 1);
             $("#article-title").html("LOADING...");
@@ -320,10 +331,20 @@
             $("#article-locations-list").html("");
             $("#article-entities-list").html("");
 
+            articleMarkers.forEach(m=>m.setMap(null));
+
             $.get("/api/article/" + articleId)
                 .done(function(article) {
+
+                    var bounds = new google.maps.LatLngBounds();
                     var locations = article.nl_entities.filter(nle => nle.type == "LOCATION" && nle.location != null);
-                    locations.forEach(location => mark(location.location, location.address, false));
+                    locations.forEach(location => {
+                        var marker = mark(location.location, location.name, false);
+                        marker.addListener('click', getInfoWindowClickHandler(marker, location));
+                        bounds.extend(marker.getPosition());
+                        articleMarkers.push(marker);
+                    });
+                    map.fitBounds(bounds);
                     
                     $("#article-title").html(article.headline);
                     $("#article-date").html(article.release_date);
@@ -383,6 +404,7 @@
                 });
             }
 
+            return marker;
         }
 
         function showArticles(entity) {
