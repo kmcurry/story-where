@@ -293,6 +293,25 @@ class WebDatabase():
 
         return article
     
+    def get_count_of_articles_by_postal_code(self, city):
+        entity_query = self.session \
+            .query(NLEntity.name, func.count(NLEntity.article_id.distinct()).label('article_count')) \
+            .group_by(NLEntity.name) \
+            .cte()
+        location_id_query = self.session \
+            .query(LocationComponent.location_id) \
+            .filter(LocationComponent.name==city)
+        zipcode_query = self.session \
+            .query(LocationComponent.name, func.sum(entity_query.c.article_count.cast(Integer)).label('total_article_count')) \
+            .join(LocationComponent.location) \
+            .join(entity_query, Location.address==entity_query.c.name) \
+            .filter(LocationComponent.type == "postal_code", LocationComponent.location_id.in_(location_id_query)) \
+            .group_by(LocationComponent.name) \
+            .order_by(desc('total_article_count')) \
+            .all()
+
+        return zipcode_query
+    
     def get_entities(self, page, length):
         entity_query = self.session \
             .query(NLEntity.name, func.count(NLEntity.article_id).label('entity_count'), func.array_agg(NLEntity.article_id)) \
