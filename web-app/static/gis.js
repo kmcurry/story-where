@@ -1,6 +1,7 @@
 var gis = {
     Chesapeake: {
-
+        boundary: "https://public-chesva.opendata.arcgis.com/datasets/e68ee91297f448188ec30034b1ac27be_31.geojson",
+        neighborhoods: "https://public-chesva.opendata.arcgis.com/datasets/e8a4bed38fdf403ca5479779884aadc2_3.geojson"
     },
     Hampton: {
 
@@ -14,7 +15,9 @@ var gis = {
         postal_codes: "https://opendata.arcgis.com/datasets/7c7145927f404d2d94cf86b62c6d6915_1.geojson"
     },
     Portsmouth: {
-
+        boundary: "http://www2.portsmouthva.gov/arcgisweb/rest/services/StandardLayers/MapServer/4",
+        neighborhoods: "http://www2.portsmouthva.gov/arcgisweb/rest/services/ArcGIS_Online_GDB/MapServer/12",
+        postal_codes: ""
     },
     Suffolk: {
 
