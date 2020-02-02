@@ -153,6 +153,12 @@ def get_count_of_articles_by_postal_code(city):
     data = db.get_count_of_articles_by_postal_code(city)
     return jsonify(data)
 
+@app.route("/api/sub-city-locations/", defaults={"cities": "Norfolk"})
+@app.route("/api/sub-city-locations/<path:cities>")
+def get_locations_within_cities(cities):
+    data = db.get_locations_within_cities(cities.split('/'))
+    return jsonify(data)
+
 @app.route("/api/proper-locations/", defaults={"salience": 0.1, "page": 0, "length": 100})
 @app.route("/api/proper-locations/<float:salience>", defaults={"page": 0, "length": 100})
 @app.route("/api/proper-locations/<float:salience>/<int:page>/", defaults={"length": 100})
