@@ -12,8 +12,8 @@
             cursor: pointer;
         }
 
-        #entityList {
-            margin-top: 40px;
+        #entitiesList {
+            margin-top: 60px;
         }
 
         #filterPanel {
@@ -37,13 +37,16 @@
 
         #mapContainer {
             height: 800px;
+            position: -webkit-sticky; /* Safari */
+            position: sticky;
+            top: 0px;
         }
 
         html,
         body {
             height: 100%;
-            margin: 6px;
-            padding: 4px;
+            margin-left: 6px;
+            margin-right: 6px;
         }
     </style>
 
@@ -77,7 +80,7 @@
                     <input id="city-search" style="width:100%">
                 </div>
             </div>
-            <ol id="entitiesList" style="margin-top: 50px"></ol>
+            <ol id="entitiesList"></ol>
         </div>
 
         <div id="article" class="col-5" style="display:none">
@@ -126,7 +129,7 @@
             </div>
         </div>
 
-        <div id="mapContainer" class="col">
+        <div id="mapContainer" class="col-9">
             <div id="map">
             </div>
         </div>

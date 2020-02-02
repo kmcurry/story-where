@@ -120,6 +120,15 @@ def map_entities():
         'entities.html',
         sections=sections)
 
+@app.route('/postal-codes/', defaults={"city": "Norfolk"})
+@app.route('/postal-codes/<string:city>')
+def map_postal_codes(city):
+    key = 'pk.eyJ1Ijoia21jdXJyeSIsImEiOiJjanJlNXE2NzMweWk1M3lscHQ5dTJ6MmU3In0.GrB9Ngw2dm4HewnoFI5rKA' # os.environ['MAPBOX_KEY']
+    print(key)
+    return render_template(
+        'postal_codes.html',
+        mapbox_key=key)
+
 
 #vv########################### API endpoints by alpha ################################
 
@@ -146,6 +155,12 @@ def get_headlines(page, length):
 def get_info(salience):
     info = db.get_info(salience)
     return jsonify(info)
+
+@app.route("/api/postal-codes/", defaults={"city": "Norfolk"})
+@app.route("/api/postal-codes/<string:city>")
+def get_count_of_articles_by_postal_code(city):
+    data = db.get_count_of_articles_by_postal_code(city)
+    return jsonify(data)
 
 @app.route("/api/proper-locations/", defaults={"salience": 0.1, "page": 0, "length": 100})
 @app.route("/api/proper-locations/<float:salience>", defaults={"page": 0, "length": 100})
