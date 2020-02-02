@@ -52,25 +52,16 @@ def before_request():
     id_token = request.cookies.get("token")
 
     if not id_token:
-        if request.endpoint.startswith('api'):
-            return jsonify({'error': "User not logged in"})
-        else:
-            return redirect('/?redirect=' + request.path)
+        return jsonify({'error': "User not logged in"})
 
     try:
         claims = google.oauth2.id_token.verify_firebase_token(
             id_token, firebase_request_adapter)
         if claims['email'] not in allowed_emails:
-            if request.endpoint.startswith('api'):
-                return jsonify({'error': "User not allowed"})
-            else:
-                return redirect('/?not-allowed=true')
+            return jsonify({'error': "User not allowed"})
     except ValueError as exc:
         error_message = str(exc)
-        if request.endpoint.startswith('api'):
-            return jsonify({'error': error_message})
-        else:
-            return redirect('/?redirect=' + request.path)
+        return jsonify({'error': error_message})
 
 #vv########################### Pages ################################
 
@@ -161,6 +152,12 @@ def get_info(salience):
 @app.route("/api/postal-codes/<string:city>")
 def get_count_of_articles_by_postal_code(city):
     data = db.get_count_of_articles_by_postal_code(city)
+    return jsonify(data)
+
+@app.route("/api/sub-city-locations/", defaults={"cities": "Norfolk"})
+@app.route("/api/sub-city-locations/<path:cities>")
+def get_locations_within_cities(cities):
+    data = db.get_locations_within_cities(cities.split('/'))
     return jsonify(data)
 
 @app.route("/api/proper-locations/", defaults={"salience": 0.1, "page": 0, "length": 100})

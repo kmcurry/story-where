@@ -312,6 +312,30 @@ class WebDatabase():
 
         return zipcode_query
     
+    def get_locations_within_cities(self, cities):
+        entity_query = self.session \
+            .query(NLEntity.name, func.count(NLEntity.article_id.distinct()).label('article_count')) \
+            .group_by(NLEntity.name) \
+            .cte()
+        location_id_query = self.session \
+            .query(LocationComponent.location_id) \
+            .filter(LocationComponent.name.in_(cities))
+        locations = self.session \
+            .query(Location, entity_query.c.article_count.cast(Integer).label('total_article_count')) \
+            .join(entity_query, Location.address==entity_query.c.name) \
+            .filter(Location.id.in_(location_id_query)) \
+            .order_by(desc('total_article_count')) \
+            .all()
+
+        location_schema = LocationSchema()
+
+        return [
+            {
+                "location": location_schema.dump(l[0]),
+                "article_count": l[1]
+            } for l in locations
+        ]
+    
     def get_entities(self, page, length):
         entity_query = self.session \
             .query(NLEntity.name, func.count(NLEntity.article_id).label('entity_count'), func.array_agg(NLEntity.article_id)) \
