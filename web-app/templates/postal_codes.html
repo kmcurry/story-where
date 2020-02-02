@@ -1,0 +1,209 @@
+<!doctype html>
+<html>
+
+    <head>
+        <title>Zip Codes</title>
+        <meta name="viewport" content="initial-scale=1.0">
+        <meta charset="utf-8">
+
+    <style>
+        /* Element overrides */
+        a {
+            color: blue !important;
+            cursor: pointer;
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin-left: 6px;
+            margin-right: 6px;
+        }
+
+        /* Classes */
+        .info {
+            padding: 6px 8px;
+            font: 14px/16px Arial, Helvetica, sans-serif;
+            background: white;
+            background: rgba(255,255,255,0.8);
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            border-radius: 5px;
+        }
+
+        .info h4 {
+            margin: 0 0 5px;
+            color: #777;
+        }
+
+        .legend {
+            line-height: 18px;
+            color: #555;
+        }
+
+        .legend i {
+            width: 18px;
+            height: 18px;
+            float: left;
+            margin-right: 8px;
+            opacity: 0.7;
+        }
+
+        td {
+            padding: 6px;
+        }
+
+        /* IDs */
+        #entitiesList {
+            margin-top: 60px;
+        }
+
+        #filterPanel {
+            display:none;
+            margin-top:50px;
+            position: fixed;
+            background-color: white;
+        }
+
+        #listTitle {
+            position: fixed;
+            background-color: white;
+            width: 100%;
+            top: 0px;
+            padding-top: 20px;
+        }
+
+        #map {
+            height: 100%;
+        }
+
+        #mapContainer {
+            height: 680px;
+            position: -webkit-sticky; /* Safari */
+            position: sticky;
+            top: 0px;
+        }
+
+        #codeEnforcementMap { 
+            height: 580px;
+        }
+
+        /* Devices */
+        @media only screen 
+        and (min-device-width: 320px) 
+        and (max-device-width: 480px)
+        and (-webkit-min-device-pixel-ratio: 2) {
+            .p-md {
+            font-size: 40px !important;
+            }
+        }
+        
+            /* Portrait */
+        @media only screen 
+        and (min-device-width: 320px) 
+        and (max-device-width: 480px)
+        and (-webkit-min-device-pixel-ratio: 2)
+        and (orientation: portrait) {
+            body {
+            font-size: 40px !important;
+            }
+            .container {
+            margin: 4px !important;
+            padding: 4px !important;
+            }
+            .tr {
+            font-size: 40px !important;
+            }
+        
+        }
+    </style>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+
+</head>
+
+<body>
+    
+    <div class="row">
+        <div id="entities" class="col-3">
+            <div id="listTitle" class="row">
+                <div class="col-2">
+                    <h2>Entities</h2>
+                </div>
+                <div class="col-1">
+                    <button id="filter-btn" class="btn btn-primary">Filter</button>
+                </div>
+            </div>
+            <div id="filterPanel">
+                <div class="ui-widget">
+                    <label for="section-search">Sections:</label>
+                    <input id="section-search" style="width:100%">
+                </div>
+                <br/>
+                <div class="ui-widget">
+                    <label for="city-search">Cities:</label>
+                    <input id="city-search" style="width:100%">
+                </div>
+            </div>
+            <ol id="entitiesList"></ol>
+        </div>
+
+        <div id="mapContainer" class="col-9">
+            <div id="map">
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+    <script>
+        var map;
+
+        var heatMapData = null;
+        var iconUrl = 'http://icons.iconarchive.com/icons/mad-science/arcade-saturdays/32/Dot-icon.png';
+
+        var availableCities = [
+            'Chesapeake',
+            'Hampton',
+            'Norfolk',
+            'Newport News',
+            'Portsmouth',
+            'Suffolk',
+            'Virginia Beach',
+            'Williamsburg'
+        ]
+
+
+        function initMap() {
+
+ 
+        }	
+
+        $( "#filter-btn" ).click(function() {
+            $( "#filterPanel" ).slideToggle( "slow" );
+        });
+
+        $(document).ready( function() {
+
+        } );
+    </script>
+
+    <script src="//d3js.org/d3.v3.min.js"></script>
+    <script src="//d3js.org/d3-collection.v1.min.js"></script>
+    <script src="//d3js.org/d3-dispatch.v1.min.js"></script>
+    <script src="//d3js.org/d3-request.v1.min.js"></script>
+    <link rel="stylesheet"     
+      href="/static/leaflet/leaflet.css"></link>
+    <script src="/static/leaflet/leaflet.js"></script>
+    <script src="https://unpkg.com/esri-leaflet@2.1.0/dist/esri-leaflet.js",
+    integrity="sha512-Tojl3UMd387f6DdAJlo+fKfJZiP55fYT+6Y58yKbHydnueOdSFOxrgLPuUxm7VW1szEt3hZVwv3V2sSUCuT35w==",
+    crossorigin=""></script>
+    <script src="/static/map_postal_codes.js"></script>
+    
+
+</body>
+
+</html>
