@@ -14,6 +14,8 @@
 
 import datetime
 import os
+import logging
+
 
 # [START gae_python37_auth_verify_token]
 from flask import Flask, render_template, request, jsonify, redirect, url_for
@@ -22,6 +24,9 @@ from google.cloud import datastore
 import google.oauth2.id_token
 
 from db import WebDatabase
+
+#logging.basicConfig()
+#logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
 db = WebDatabase()
 
@@ -47,16 +52,25 @@ def before_request():
     id_token = request.cookies.get("token")
 
     if not id_token:
-        return jsonify({'error': "User not logged in"})
+        if request.endpoint.startswith('api'):
+            return jsonify({'error': "User not logged in"})
+        else:
+            return redirect('/?redirect=' + request.path)
 
     try:
         claims = google.oauth2.id_token.verify_firebase_token(
             id_token, firebase_request_adapter)
         if claims['email'] not in allowed_emails:
-            return jsonify({'error': "User not allowed"})
+            if request.endpoint.startswith('api'):
+                return jsonify({'error': "User not allowed"})
+            else:
+                return redirect('/?not-allowed=true')
     except ValueError as exc:
         error_message = str(exc)
-        return jsonify({'error': error_message}) 
+        if request.endpoint.startswith('api'):
+            return jsonify({'error': error_message})
+        else:
+            return redirect('/?redirect=' + request.path)
 
 #vv########################### Pages ################################
 
@@ -109,47 +123,47 @@ def map_entities():
 
 #vv########################### API endpoints by alpha ################################
 
-@app.route('/article/<int:article_id>')
+@app.route('/api/article/<int:article_id>')
 def get_article(article_id): 
     return jsonify(db.get_article(article_id))
 
-@app.route("/entities/", defaults={"page": 0, "length": 100})
-@app.route("/entities/<int:page>", defaults={"length": 100})
-@app.route('/entities/<int:page>/<int:length>')
+@app.route("/api/entities/", defaults={"page": 0, "length": 100})
+@app.route("/api/entities/<int:page>", defaults={"length": 100})
+@app.route('/api/entities/<int:page>/<int:length>')
 def get_entities(page, length):
     entities = db.get_entities(page, length)
     return jsonify(entities)
 
-@app.route("/headlines/", defaults={"page": 0, "length": 100})
-@app.route("/headlines/<int:page>/", defaults={"length": 100})
-@app.route('/headlines/<int:page>/<int:length>')
+@app.route("/api/headlines/", defaults={"page": 0, "length": 100})
+@app.route("/api/headlines/<int:page>/", defaults={"length": 100})
+@app.route('/api/headlines/<int:page>/<int:length>')
 def get_headlines(page, length): 
     headlines = db.get_headlines(page, length)
     return jsonify(headlines)
 
-@app.route("/info/", defaults={"salience": 0.1})
-@app.route("/info/<float:salience>")
+@app.route("/api/info/", defaults={"salience": 0.1})
+@app.route("/api/info/<float:salience>")
 def get_info(salience):
     info = db.get_info(salience)
     return jsonify(info)
 
-@app.route("/proper-locations/", defaults={"salience": 0.1, "page": 0, "length": 100})
-@app.route("/proper-locations/<float:salience>", defaults={"page": 0, "length": 100})
-@app.route("/proper-locations/<float:salience>/<int:page>/", defaults={"length": 100})
-@app.route("/proper-locations/<float:salience>/<int:page>/<int:length>")
+@app.route("/api/proper-locations/", defaults={"salience": 0.1, "page": 0, "length": 100})
+@app.route("/api/proper-locations/<float:salience>", defaults={"page": 0, "length": 100})
+@app.route("/api/proper-locations/<float:salience>/<int:page>/", defaults={"length": 100})
+@app.route("/api/proper-locations/<float:salience>/<int:page>/<int:length>")
 def get_proper_locations(salience, page, length):
     proper_locations = db.get_proper_locations(salience, page, length)
     return jsonify(proper_locations)
 
-@app.route("/proper-organizations/", defaults={"salience": 0.1, "page": 0, "length": 100})
-@app.route("/proper-organizations/<float:salience>", defaults={"page": 0, "length": 100})
-@app.route("/proper-organizations/<float:salience>/<int:page>/", defaults={"length": 100})
-@app.route("/proper-organizations/<float:salience>/<int:page>/<int:length>")
+@app.route("/api/proper-organizations/", defaults={"salience": 0.1, "page": 0, "length": 100})
+@app.route("/api/proper-organizations/<float:salience>", defaults={"page": 0, "length": 100})
+@app.route("/api/proper-organizations/<float:salience>/<int:page>/", defaults={"length": 100})
+@app.route("/api/proper-organizations/<float:salience>/<int:page>/<int:length>")
 def get_proper_organizations(salience, page, length):
     proper_organizations = db.get_proper_organizations(salience, page, length)
     return jsonify(proper_organizations)
 
-@app.route("/sections")
+@app.route("/api/sections")
 def get_sections():
     sections = db.get_sections()
     return jsonify(sections)
