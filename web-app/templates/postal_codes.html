@@ -153,31 +153,12 @@
     <script>
         var map;
 
-        var heatMapData = null;
-        var iconUrl = 'http://icons.iconarchive.com/icons/mad-science/arcade-saturdays/32/Dot-icon.png';
-
-        var availableCities = [
-            'Chesapeake',
-            'Hampton',
-            'Norfolk',
-            'Newport News',
-            'Portsmouth',
-            'Suffolk',
-            'Virginia Beach',
-            'Williamsburg'
-        ]
-
-
-        function initMap() {
-
- 
-        }	
-
         $( "#filter-btn" ).click(function() {
             $( "#filterPanel" ).slideToggle( "slow" );
         });
 
         $(document).ready( function() {
+            initMap();
             loadBoundary(city);
         } );
     </script>
