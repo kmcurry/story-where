@@ -1,4 +1,4 @@
-var map = L.map("map").setView([36.6782395,-76.0781193], 10); // TODO: hardcoded
+var map = L.map("map").setView([36.9030463,-76.3381129], 9.75); // TODO: hardcoded
 var map_data = null;
 
 var postal_code_boundary = null;
@@ -54,8 +54,8 @@ function getColor(d) {
         d > 2000 ? '#b74c4c' :
         d > 1000 ? '#c16666' :
         d > 500 ? '#cc7f7f' :
-        d > 400 ? '#d69999' :
-        d > 300 ? '#e0b2b2' :
+        d > 300 ? '#d69999' :
+        d > 100 ? '#e0b2b2' :
         d > 50 ? '#eacccc' :
         d > 10 ? '#f4e5e5' :
         d > 5 ? '#eee5e5' :
@@ -82,7 +82,7 @@ var legend = L.control({position: 'bottomright'});
 legend.onAdd = function (map) {
 
     var div = L.DomUtil.create('div', 'info legend');
-    var grades = [0, 10, 50, 300, 400, 500, 1000, 2000, 3000, 4000, 5000];
+    var grades = [0, 10, 50, 100, 300, 500, 1000, 2000, 3000, 4000, 5000];
 
     // loop through our density intervals and generate a label with a colored square for each interval
     for (var i = 0; i < grades.length; i++) {
