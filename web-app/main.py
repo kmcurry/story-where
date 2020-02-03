@@ -41,7 +41,7 @@ allowed_emails = [
     'ben.schoenfeld@gmail.com',
     'kmcurry@gmail.com',
     'ericasmith13@gmail.com',
-    'e.smith@pilotonline.com '
+    'e.smith@pilotonline.com'
 ]
 
 @app.before_request
