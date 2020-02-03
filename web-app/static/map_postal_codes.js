@@ -48,12 +48,16 @@ var loadArticleCounts = function(city) {
 function getColor(d) {
     //console.log(d);
     
-    return d>=3000 ? '#990000' : 
-        d >2000 ? '#d7301f' :
-        d > 1500 ? '#ef6548' :
-        d > 500 ? '#fc8d59' :
-        d > 100 ? '#fdbb84' :
-        d > 10 ? '#fdd49e' :
+    return d>=5000 ? '#990000' : 
+        d >4000 ? '#a31919' :
+        d > 3000 ? '#ad3232' :
+        d > 2000 ? '#b74c4c' :
+        d > 1000 ? '#c16666' :
+        d > 500 ? '#cc7f7f' :
+        d > 400 ? '#d69999' :
+        d > 300 ? '#e0b2b2' :
+        d > 50 ? '#eacccc' :
+        d > 10 ? '#f4e5e5' :
         '#eeeeee';
 }
 
@@ -77,7 +81,7 @@ var legend = L.control({position: 'bottomright'});
 legend.onAdd = function (map) {
 
     var div = L.DomUtil.create('div', 'info legend');
-    var grades = [0, 10, 100, 500, 1500, 2000, 3000];
+    var grades = [0, 10, 50, 300, 400, 500, 1000, 2000, 3000, 4000, 5000];
 
     // loop through our density intervals and generate a label with a colored square for each interval
     for (var i = 0; i < grades.length; i++) {
