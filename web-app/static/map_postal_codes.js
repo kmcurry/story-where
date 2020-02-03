@@ -58,12 +58,13 @@ function getColor(d) {
         d > 300 ? '#e0b2b2' :
         d > 50 ? '#eacccc' :
         d > 10 ? '#f4e5e5' :
+        d > 5 ? '#eee5e5' :
         '#eeeeee';
 }
 
 function style(feature) {
     return {
-        fillColor: feature.properties.color ? feature.properties.color : "#eeeeee",
+        fillColor: feature.properties.color ? feature.properties.color : "white",
         weight: 2,
         opacity: 1,
         color: 'white',
