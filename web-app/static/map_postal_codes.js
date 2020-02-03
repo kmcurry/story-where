@@ -1,7 +1,47 @@
 var map = L.map("map").setView([36.6782395,-76.0781193], 10); // TODO: hardcoded
-
+var map_data = null;
 
 var postal_code_boundary = null;
+
+var initMap = function() {
+    $.ajax({
+        dataType: "json",
+        url: "/static/va.json",//gis[city_].postal_codes,
+        success: function (data) {
+
+            postal_code_boundary = new L.geoJson(data, {
+                style: style,
+                onEachFeature: onEachFeature
+            });
+            postal_code_boundary.addTo(map);
+
+            map_data = data;
+        }
+    });
+}
+
+var loadBoundary = function(city) {
+    console.log("Loading Boundary for: " + city);
+
+    getCountByPostalCode(city).then(function (counts) {
+        if (counts) {
+
+            counts.map(function(count) {
+                postal_code_boundary.eachLayer(function(layer) {
+                    //console.log(layer.feature.properties.ZCTA5CE10);
+                    if (layer.feature.properties.ZCTA5CE10 == count[0]) {
+                        var color = getColor(count[1]);
+                        //console.log(color);
+                        layer.setStyle({fillColor: color});
+                        layer.feature.properties.count = count[1];
+                        layer.feature.properties.color = color;
+                    }
+                });
+            });
+
+        }
+    });
+}
 
 
 function getColor(d) {
@@ -17,11 +57,8 @@ function getColor(d) {
 }
 
 function style(feature) {
-    //console.log(feature.properties.count)
-    var fill = getColor(feature.properties.count);
-    //console.log("Fill Color: " + fill);
     return {
-        fillColor: fill,
+        fillColor: feature.properties.color ? feature.properties.color : "#eeeeee",
         weight: 2,
         opacity: 1,
         color: 'white',
@@ -64,11 +101,10 @@ info.onAdd = function (map) {
 // method that we will use to update the control based on feature properties passed
 info.update = function (props) {
     if (!props) return;
-
     var count = props.count ? props.count : 0;
-    var zip = props.ZIP_CODE ? props.ZIP_CODE : props.ZIP
+    var postal_code = props.ZCTA5CE10 ? props.ZCTA5CE10 : props.ZIP_CODE ? props.ZIP_CODE : props.ZIP;
     this._div.innerHTML = '<h4>Articles by Postal Code</h4>' +  (props ?
-        '<b>Postal Code: ' + zip + '<br />' + count + ' articles</b>'
+        '<b>Postal Code: ' + postal_code + '<br />' + count + ' articles</b>'
         : '');
 };
 
@@ -130,33 +166,3 @@ var getCountByPostalCode = function(city) {
   
 }
 
-var loadBoundary = function(city) {
-    console.log("Loading Boundary for: " + city);
-    var city_ = city.replace(' ', '');
-    console.log(gis[city_].postal_codes);
-
-    $.ajax({
-        dataType: "json",
-        url: gis[city_].postal_codes,
-        success: function (data) {
-    
-            getCountByPostalCode(city).then(function (counts) {
-                if (counts) {
-                    console.log(counts)
-                    data.features.forEach(function (feature, index) {
-                        var articlesInPostalCode = counts.map(function(count) {
-                            return count[1];
-                        })
-                        feature.properties.count = articlesInPostalCode[index];
-                    });
-                    
-                    postal_code_boundary = new L.geoJson(data, {
-                        style: style,
-                        onEachFeature: onEachFeature
-                    });
-                    postal_code_boundary.addTo(map);
-                }
-            });
-        }
-    });
-}
