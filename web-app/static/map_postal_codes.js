@@ -20,8 +20,8 @@ var initMap = function() {
     });
 }
 
-var loadBoundary = function(city) {
-    console.log("Loading Boundary for: " + city);
+var loadArticleCounts = function(city) {
+    console.log("Loading Counts for: " + city);
 
     getCountByPostalCode(city).then(function (counts) {
         if (counts) {
@@ -41,6 +41,7 @@ var loadBoundary = function(city) {
 
         }
     });
+    return true;
 }
 
 
