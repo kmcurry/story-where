@@ -48,7 +48,7 @@ var loadArticleCounts = function(city) {
 function getColor(d) {
     //console.log(d);
     
-    return d>=5000 ? '#990000' : 
+    return d>=5000 ? '#921616' : 
         d >4000 ? '#a31919' :
         d > 3000 ? '#ad3232' :
         d > 2000 ? '#b74c4c' :
