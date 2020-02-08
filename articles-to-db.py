@@ -28,7 +28,7 @@ def cleanhtml(raw_html):
 # Returns a string
 def get_text(tag_name):
     tag = xml.find('.//*x:' + tag_name, ns)
-    return cleanhtml("".join(tag.itertext())) if tag is not None else None
+    return cleanhtml(" ".join(tag.itertext())) if tag is not None else None
 
 # Get all text from p tags within named tag
 # Cleans text
@@ -38,8 +38,15 @@ def get_p_text(tag_name):
     p_tags = tag.findall('./x:p', ns)
     body = ""
     for p_tag in p_tags:
-        body += "".join(p_tag.itertext()) + "\n"
-    return cleanhtml(body)
+        p_tag_text = " ".join(p_tag.itertext())
+        if body == "" and p_tag_text.startswith("<h5>") and p_tag_text.endswith("</h5>"):
+            p_tag_text = cleanhtml(p_tag_text).title()
+        else:
+            p_tag_text = cleanhtml(p_tag_text)
+        if p_tag_text == "This is a developing story. Check back at PilotOnline.com for details.":
+            continue
+        body += p_tag_text + "\n"
+    return body
 
 # Get all web sections under pubdata tag
 # Returns list of strings
@@ -152,7 +159,30 @@ filtered_headlines = [
     "day lineup",
     "day's lineup",
     "night lineup",
-    "C1 Refer"
+    "C1 Refer",
+    "Housing Report",
+    "Housing report",
+    "lipper crime",
+    "ompass crime",
+    "rime report",
+    "-agenda-",
+    "Council Agenda",
+    "Board Agenda",
+    "agenda0",
+    "ouncil agenda",
+    "oard agenda",
+    "meeting agenda",
+    "clipper agenda",
+    "school agenda",
+    "schools agenda",
+    "Car calendar",
+    "Living calendar",
+    "Arts Calendar",
+    "Business Calendar",
+    "orrections for",
+    "orrection for",
+    "Correction:",
+    "week of"
 ]
 
 filtered_exact_headlines = [
