@@ -60,13 +60,16 @@
 <body>
     
     <div class="row">
-        <div id="entities" class="col-3">
+        <div id="entities" class="col-5">
             <div id="listTitle" class="row">
-                <div class="col-2">
+                <div class="col-1">
                     <h2>Entities</h2>
                 </div>
                 <div class="col-1">
                     <button id="filter-btn" class="btn btn-primary">Filter</button>
+                </div>
+                <div class="col-1">
+                    <button id="clear-btn" class="btn btn-primary">Clear</button>
                 </div>
             </div>
             <div id="filterPanel">
@@ -129,7 +132,7 @@
             </div>
         </div>
 
-        <div id="mapContainer" class="col-9">
+        <div id="mapContainer" class="col-7">
             <div id="map">
             </div>
         </div>
@@ -140,7 +143,7 @@
 
     <script>
         var map;
-
+        var heatmapLayer;
         var heatMapData = null;
         var iconUrl = 'http://icons.iconarchive.com/icons/mad-science/arcade-saturdays/32/Dot-icon.png';
 
@@ -155,6 +158,9 @@
             'Williamsburg'
         ]
 
+        function clearMap() {
+            heatmapLayer.setMap(null);
+        }
 
         function initMap() {
 
@@ -248,12 +254,12 @@
                     ]
             });
 
-            var heatmap = new google.maps.visualization.HeatmapLayer({
+            heatmapLayer = new google.maps.visualization.HeatmapLayer({
                 data: heatMapData,
                 radius: 20,
                 opacity: 0.8
             });
-            heatmap.setMap(map);
+            heatmapLayer.setMap(map);
 
             getMoreEntities(0);
         }
@@ -424,17 +430,24 @@
             }
         });	
 
-        $( "#filter-btn" ).click(function() {
-            $( "#filterPanel" ).slideToggle( "slow" );
-        });
-
         $(document).ready( function() {
+            
             var availableSections = {{sections|tojson}};
+
             $( "#section-search" ).autocomplete({
                 source: availableSections
             });
+            
             $( "#city-search" ).autocomplete({
                 source: availableCities
+            });
+
+            $( "#clear-btn" ).click(function() {
+                clearMap();
+            });
+
+            $( "#filter-btn" ).click(function() {
+                $( "#filterPanel" ).slideToggle( "slow" );
             });
 
             $("#article-back-btn").click(function() {
@@ -446,6 +459,7 @@
                 curArticle += 1;
                 mapArticle(articleIds[curArticle]);
             });
+        
         } );
     </script>
 
