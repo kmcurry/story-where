@@ -1,4 +1,42 @@
+a {
+  color: blue !important;
+  cursor: pointer;
+}
+
+#entitiesList {
+  margin-top: 60px;
+}
+
+#filterPanel {
+  display:none;
+  margin-top:50px;
+  position: fixed;
+  background-color: white;
+}
+
+#listTitle {
+  position: fixed;
+  background-color: white;
+  width: 100%;
+  top: 0px;
+  padding-top: 20px;
+}
+
+#map {
+  height: 100%;
+}
+
+#mapContainer {
+  height: 800px;
+  position: -webkit-sticky; /* Safari */
+  position: sticky;
+  top: 0px;
+}
+
+html,
 body {
+  height: 100%;
+  margin-left: 6px;
+  margin-right: 6px;
   font-family: "helvetica", sans-serif;
-  text-align: center;
 }
