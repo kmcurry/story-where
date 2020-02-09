@@ -128,9 +128,11 @@ def map_postal_codes(city):
 
 #vv########################### API endpoints by alpha ################################
 
-@app.route('/api/locations')
-def get_locations(): 
-    return jsonify(db.get_locations_for_sections(['business/banking', 'business/ports-rail']))
+@app.route('/api/locations/', methods=['POST'])
+def get_locations():
+    sections = request.get_json(force=True)
+    return jsonify(db.get_locations_for_sections(sections))
+    
 
 @app.route('/api/entity/<path:entity>')
 def get_articles_for_entity(entity): 
