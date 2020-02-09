@@ -1,17 +1,46 @@
+/* Element overrides */
 a {
   color: blue !important;
   cursor: pointer;
 }
 
+html,
+body {
+  height: 100%;
+  margin-left: 6px;
+  margin-right: 6px;
+  font-family: "helvetica", sans-serif;
+}
+
+/* Classes */
+.info {
+  padding: 6px 8px;
+  font: 14px/16px Arial, Helvetica, sans-serif;
+  background: white;
+  background: rgba(255,255,255,0.8);
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+  border-radius: 5px;
+}
+
+.info h4 {
+  margin: 0 0 5px;
+  color: #777;
+}
+
+
+/* IDs */
 #entitiesList {
   margin-top: 60px;
 }
 
-#filterPanel {
+#filter-panel {
   display:none;
-  margin-top:50px;
+  margin-top:60px;
+  margin-left:8px;
   position: fixed;
   background-color: white;
+  z-index: 20;
+  /* border: black 1px solid; */
 }
 
 #listTitle {
@@ -31,12 +60,4 @@ a {
   position: -webkit-sticky; /* Safari */
   position: sticky;
   top: 0px;
-}
-
-html,
-body {
-  height: 100%;
-  margin-left: 6px;
-  margin-right: 6px;
-  font-family: "helvetica", sans-serif;
 }

@@ -7,33 +7,12 @@
         <meta charset="utf-8">
 
     <style>
-        /* Element overrides */
-        a {
-            color: blue !important;
-            cursor: pointer;
+        /* Elements */
+        td {
+            padding: 6px;
         }
-
-        html,
-        body {
-            height: 100%;
-            margin-left: 6px;
-            margin-right: 6px;
-        }
-
+        
         /* Classes */
-        .info {
-            padding: 6px 8px;
-            font: 14px/16px Arial, Helvetica, sans-serif;
-            background: white;
-            background: rgba(255,255,255,0.8);
-            box-shadow: 0 0 15px rgba(0,0,0,0.2);
-            border-radius: 5px;
-        }
-
-        .info h4 {
-            margin: 0 0 5px;
-            color: #777;
-        }
 
         .legend {
             line-height: 18px;
@@ -48,44 +27,11 @@
             opacity: 0.7;
         }
 
-        td {
-            padding: 6px;
-        }
-
         /* IDs */
-        #entitiesList {
-            margin-top: 60px;
-        }
-
-        #filterPanel {
-            display:none;
-            margin-top:50px;
-            position: fixed;
-            background-color: white;
-        }
-
-        #listTitle {
-            position: fixed;
-            background-color: white;
-            width: 100%;
-            top: 0px;
-            padding-top: 20px;
-        }
 
         #map {
             height: 100%;
             background-color:#bfcde2;
-        }
-
-        #mapContainer {
-            height: 680px;
-            position: -webkit-sticky; /* Safari */
-            position: sticky;
-            top: 0px;
-        }
-
-        #codeEnforcementMap { 
-            height: 580px;
         }
 
         /* Devices */
@@ -122,6 +68,8 @@
         integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+    
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
     <script>
         var mapbox_key = {{ mapbox_key | tojson }};
