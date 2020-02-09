@@ -132,6 +132,10 @@ def map_postal_codes(city):
 def get_locations(): 
     return jsonify(db.get_locations_for_sections(['business/banking', 'business/ports-rail']))
 
+@app.route('/api/entity/<path:entity>')
+def get_articles_for_entity(entity): 
+    return jsonify(db.get_articles_for_entity(entity))
+
 @app.route('/api/article/<int:article_id>')
 def get_article(article_id): 
     return jsonify(db.get_article(article_id))

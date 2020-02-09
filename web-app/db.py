@@ -293,6 +293,21 @@ class WebDatabase():
 
         return article
     
+    def get_articles_for_entity(self, entity):
+        articles = self.session \
+            .query(Article.id, Article.headline) \
+            .join(Article.nl_entities) \
+            .filter(NLEntity.name == entity) \
+            .order_by(Article.id) \
+            .all()
+        
+        return [
+            {
+                "id": a[0],
+                "headline": a[1]
+            } for a in articles
+        ]
+
     def get_locations_for_sections(self, sections):
         articles_in_sections = self.session \
             .query(Article.id) \
