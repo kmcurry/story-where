@@ -293,6 +293,49 @@ class WebDatabase():
 
         return article
     
+    def get_articles_for_entity(self, entity):
+        articles = self.session \
+            .query(Article.id, Article.headline) \
+            .join(Article.nl_entities) \
+            .filter(NLEntity.name == entity) \
+            .order_by(Article.id) \
+            .all()
+        
+        return [
+            {
+                "id": a[0],
+                "headline": a[1]
+            } for a in articles
+        ]
+
+    def get_locations_for_sections(self, sections):
+        articles_in_sections = self.session \
+            .query(Article.id) \
+            .join(Article.sections) \
+            .filter(Section.name.in_(sections)) \
+            .cte()
+        
+        entity_query = self.session \
+            .query(NLEntity.name, func.count(NLEntity.article_id.distinct()).label('article_count')) \
+            .filter(NLEntity.proper, NLEntity.type.in_( ("ORGANIZATION", "LOCATION") ), NLEntity.article_id.in_(articles_in_sections)) \
+            .group_by(NLEntity.name) \
+            .cte()
+        
+        locations = self.session \
+            .query(Location, entity_query.c.article_count.cast(Integer).label('article_count')) \
+            .join(entity_query, Location.address==entity_query.c.name) \
+            .order_by(desc('article_count'), 'name') \
+            .all()
+
+        location_schema = LocationSchema()
+
+        return [
+            {
+                "location": location_schema.dump(l[0]),
+                "article_count": l[1]
+            } for l in locations
+        ]
+    
     def get_count_of_articles_by_postal_code(self, city):
         entity_query = self.session \
             .query(NLEntity.name, func.count(NLEntity.article_id.distinct()).label('article_count')) \
