@@ -165,11 +165,40 @@ var map;
         }
 
         function mapSection() {
-            console.log($("#section-search").val());
+            var val = $("#section-search").val();
+            console.log(val);
             clearMap();
+            var sections = [1]
+            sections[0] = val;
+
+            var request = $.ajax({
+                url: "/api/locations/",
+                method: "POST",
+                data: JSON.stringify(sections),
+                dataType: "json"
+            });
+            
+            request.done(function( locations ) {
+                heatMapData = null;
+                heatMapData = new google.maps.MVCArray([]);
+
+                locations.forEach(location => appendEntity(location));
+
+                heatmapLayer = new google.maps.visualization.HeatmapLayer({
+                    data: heatMapData,
+                    radius: 20,
+                    opacity: 0.8
+                });
+                heatmapLayer.setMap(map);
+
+            });
+            
+            request.fail(function( jqXHR, textStatus ) {
+                console.log( "Request failed: " + textStatus );
+            });
         }
 
-        function appendEntity(entity, page) {
+        function appendEntity(entity) {
             var entitiesList = document.getElementById("entitiesList");
             var li = document.createElement("li");
             var p = document.createElement("p");
@@ -218,7 +247,7 @@ var map;
                         entitiesList.appendChild(text);
                     }
 
-                    entities.forEach(entity => appendEntity(entity, page));
+                    entities.forEach(entity => appendEntity(entity));
 
                 }
 
@@ -322,8 +351,4 @@ var map;
             }
 
             return marker;
-        }
-
-        function showArticles(entity) {
-            console.log("Showing Articles for Entity: " + entity);
         }
