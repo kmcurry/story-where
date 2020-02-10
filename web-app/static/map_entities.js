@@ -14,6 +14,16 @@ var map;
             'Williamsburg'
         ]
 
+        function clearAll() {
+            clearEntityList();
+            clearMap();
+        }
+
+        function clearEntityList() {
+            $("#entitiesList").empty();
+            
+        }
+
         function clearMap() {
             heatmapLayer.setMap(null);
         }
@@ -167,7 +177,7 @@ var map;
         function mapSection() {
             var val = $("#section-search").val();
             console.log(val);
-            clearMap();
+            clearAll();
             var sections = [1]
             sections[0] = val;
 
@@ -203,7 +213,8 @@ var map;
             var li = document.createElement("li");
             var p = document.createElement("p");
             var a = document.createElement("a");
-            var text = document.createTextNode(entity['entity']);
+            var type  = entity['entity'] ? entity['entity'] : entity['location'].address
+            var text = document.createTextNode(type);
             var small = document.createElement("small");
             var smallText = document.createTextNode(entity['article_count'] + " articles");
             var method = "mapArticles('" + JSON.stringify(entity) + "')";
