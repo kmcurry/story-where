@@ -1,0 +1,238 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Map</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+
+    <style>
+        #map {
+            height: 100%;
+        }
+
+        #mapContainer {
+            height: 800px;
+            position: -webkit-sticky; /* Safari */
+            position: sticky;
+            top: 0px;
+        }
+
+        #header {
+            position: -webkit-sticky; /* Safari */
+            position: sticky;
+            top: 0px;
+            z-index: 10;
+            background: white;
+            padding: 10px;
+        }
+
+        .noselect {
+            -webkit-touch-callout: none; /* iOS Safari */
+            -webkit-user-select: none; /* Safari */
+            -khtml-user-select: none; /* Konqueror HTML */
+            -moz-user-select: none; /* Old versions of Firefox */
+            -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Opera and Firefox */
+        }
+    </style>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+
+</head>
+
+<body>
+
+    <div class="container-fluid">
+        <div class="row">
+
+            <div id="sections" class="col-4">
+                <div id="header">
+                    <button id="map-sections-btn" class="btn btn-primary float-right">Map</button>
+                    <h5>Sections</h5>
+                    <div class="form-inline">
+                        <input id="section-filter" class="form-control mr-2" placeholder="Filter"/>
+                        <button id="sections-select-all-btn" class="btn btn-success mr-2">Select All</button>
+                        <button id="sections-select-clear-btn" class="btn btn-dark">Clear</button>
+                    </div>
+                </div>
+                <div id="section-list"></div>
+            </div>
+
+            <div id="locations" class="col-4" style="display:none">
+                <div id="header">
+                    <button id="back-to-sections-btn" class="btn btn-primary float-right">Back</button>
+                    <h5>Locations</h5>
+                </div>
+                <div id="location-list"></div>
+            </div>
+
+            <div id="headlines" class="col-5" style="display:none">
+                <div id="header">
+                    <button id="back-to-locations-btn" class="btn btn-primary float-right">Back</button>
+                    <h5>Articles</h5>
+                </div>
+                <div id="headline-list"></div>
+            </div>
+
+            <div id="article" class="col-7" style="display:none"></div>
+
+            <div id="mapContainer" class="col">
+                <div id="map"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+    <script>
+
+        var map;
+        var heatmapLayer;
+        var heatMapData;
+
+        function initMap() {
+
+            heatMapData = new google.maps.MVCArray([]);
+
+            var hampton_roads = new google.maps.LatLng(36.6, -76.3637);
+
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: hampton_roads,
+                zoom: 9
+            });
+
+            heatmapLayer = new google.maps.visualization.HeatmapLayer({
+                data: heatMapData,
+                radius: 20,
+                opacity: 0.8
+            });
+            heatmapLayer.setMap(map);
+        }
+
+        function getSections() {
+            $.get('/api/sections', function(sections) {
+                sections.forEach(section => {
+                    $('#section-list').append('<div class="row"><div class="col noselect">' + section + '</div></div>');
+                });
+                $('#section-list .col').mousedown(function() {
+                    $(this).toggleClass('alert-warning');
+                });
+            });
+        }
+
+        function getSelectedSections() {
+            var sections = [];
+            $('#section-list .alert-warning').each(function() {
+                sections.push($(this).html());
+            });
+            return sections;
+        }
+
+        function getLocations() {
+            $('#location-list').html('Loading...');
+
+            $('#locations').show();
+            $('#sections').hide();
+
+            var sections = getSelectedSections();
+            $.post('/api/locations', JSON.stringify(sections), function(locations) {
+                console.log(locations);
+                $('#location-list').html('');
+                locations.forEach(location => {
+                    var locationHtml = '<div class="location-name">' + location.location.address + '</div>';
+                    var articleCountHtml = '<div class="text-muted small mb-1">' + location.article_count + ' articles</div>';
+                    $('#location-list').append('<div class="row"><div class="col">' + locationHtml +  articleCountHtml + '</div></div>');
+
+                    if (location.location.lat > 36.5 && 
+                        location.location.lat < 37.2 && 
+                        location.location.lng > -77 && 
+                        location.location.lng < -75.5)
+                    {
+                        heatMapData.push({
+                            "location": new google.maps.LatLng(location.location.lat, location.location.lng),
+                            "weight": location.article_count
+                        });
+                    }
+                });
+                $('#location-list .location-name').click(function() {
+                    getLocationHeadlines($(this).html());
+                })
+            });
+        }
+
+        function getLocationHeadlines(locationName) {
+            $('#headline-list').html('Loading...');
+
+            $('#headlines').show();
+            $('#locations').hide();
+
+            var sections = getSelectedSections();
+            $.post('/api/location/' + locationName, JSON.stringify(sections), function(articles) {
+                console.log(articles);
+                $('#headline-list').html('');
+                articles.forEach(article => {
+                    $('#headline-list').append('<div class="headline">' + article.headline + '</div>')
+                });
+            });
+        }
+
+        $(document).ready(function () {
+            getSections();
+
+            $(document).mousedown(function() {
+                $("#section-list .col").bind('mouseover',function() {
+                    $(this).toggleClass('alert-warning');
+                });
+            })
+            .mouseup(function() {
+                $("#section-list .col").unbind('mouseover');
+            });
+
+            $('#section-filter').on('keyup', function() {
+                var filter = $(this).val();
+                $("#section-list .col").each(function() {
+                    if(filter && $(this).html().indexOf(filter) === -1)
+                        $(this).hide();
+                    else
+                        $(this).show();
+                });
+            });
+
+            $('#sections-select-all-btn').click(function() {
+                $("#section-list .col:visible").each(function() {
+                    $(this).addClass('alert-warning');
+                });
+            });
+
+            $('#sections-select-clear-btn').click(function() {
+                $("#section-list .col:visible").each(function() {
+                    $(this).removeClass('alert-warning');
+                });
+            });
+
+            $('#map-sections-btn').click(getLocations);
+            $('#back-to-sections-btn').click(function() {
+                $('#locations').hide();
+                $('#sections').show();
+                heatMapData.clear();
+            });
+            $('#back-to-locations-btn').click(function() {
+                $('#headlines').hide();
+                $('#locations').show();
+            });
+        });
+    </script>
+
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBUTbge6vBRkzguyuwbBSVT_2Wu_gLi9nQ&callback=initMap&libraries=visualization">
+    </script>
+
+</body>
+
+</html>

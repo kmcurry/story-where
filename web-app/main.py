@@ -115,6 +115,11 @@ def map_entities():
         'entities.html',
         sections=sections)
 
+@app.route('/map2/')
+def map_entities2():
+    return render_template('entities2.html')
+
+
 @app.route('/postal-codes/', defaults={"city": "Norfolk"})
 @app.route('/postal-codes/<string:city>/')
 def map_postal_codes(city):
@@ -128,15 +133,16 @@ def map_postal_codes(city):
 
 #vv########################### API endpoints by alpha ################################
 
-@app.route('/api/locations/', methods=['POST'])
+@app.route('/api/locations', methods=['POST'])
 def get_locations():
     sections = request.get_json(force=True)
     return jsonify(db.get_locations_for_sections(sections))
     
 
-@app.route('/api/entity/<path:entity>')
-def get_articles_for_entity(entity): 
-    return jsonify(db.get_articles_for_entity(entity))
+@app.route('/api/location/<path:location>', methods=['POST'])
+def get_articles_for_location(location): 
+    sections = request.get_json(force=True)
+    return jsonify(db.get_articles_for_entity(sections, location))
 
 @app.route('/api/article/<int:article_id>')
 def get_article(article_id): 

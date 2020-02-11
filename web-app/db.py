@@ -293,11 +293,20 @@ class WebDatabase():
 
         return article
     
-    def get_articles_for_entity(self, entity):
+    def get_articles_for_entity(self, sections, entity):
+        article_id_filter = True
+        if len(sections) > 0:
+            articles_in_sections = self.session \
+                .query(Article.id) \
+                .join(Article.sections) \
+                .filter(Section.name.in_(sections)) \
+                .cte()
+            article_id_filter = NLEntity.article_id.in_(articles_in_sections)
+
         articles = self.session \
             .query(Article.id, Article.headline) \
             .join(Article.nl_entities) \
-            .filter(NLEntity.name == entity) \
+            .filter(NLEntity.name == entity, article_id_filter) \
             .order_by(Article.id) \
             .all()
         
@@ -309,15 +318,18 @@ class WebDatabase():
         ]
 
     def get_locations_for_sections(self, sections):
-        articles_in_sections = self.session \
-            .query(Article.id) \
-            .join(Article.sections) \
-            .filter(Section.name.in_(sections)) \
-            .cte()
+        article_id_filter = True
+        if len(sections) > 0:
+            articles_in_sections = self.session \
+                .query(Article.id) \
+                .join(Article.sections) \
+                .filter(Section.name.in_(sections)) \
+                .cte()
+            article_id_filter = NLEntity.article_id.in_(articles_in_sections)
         
         entity_query = self.session \
             .query(NLEntity.name, func.count(NLEntity.article_id.distinct()).label('article_count')) \
-            .filter(NLEntity.proper, NLEntity.type.in_( ("ORGANIZATION", "LOCATION") ), NLEntity.article_id.in_(articles_in_sections)) \
+            .filter(NLEntity.proper, NLEntity.type.in_( ("ORGANIZATION", "LOCATION") ), article_id_filter) \
             .group_by(NLEntity.name) \
             .cte()
         
