@@ -123,6 +123,13 @@ def map_entities():
 def map_entities2():
     return render_template('entities2.html')
 
+@app.route('/map/<path:section>')
+def map_section(section):
+    section = [section]
+    locations = db.get_locations_for_sections(section)
+    return render_template(
+        'entities.html',
+        locations=locations)
 
 @app.route('/postal-codes/', defaults={"city": "Norfolk"})
 @app.route('/postal-codes/<string:city>/')

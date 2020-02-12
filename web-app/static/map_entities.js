@@ -182,7 +182,7 @@ var map;
             sections[0] = val;
 
             var request = $.ajax({
-                url: "/api/locations/",
+                url: "/api/locations",
                 method: "POST",
                 data: JSON.stringify(sections),
                 dataType: "json"
