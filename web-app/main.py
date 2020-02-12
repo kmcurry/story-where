@@ -18,7 +18,7 @@ import logging
 
 
 # [START gae_python37_auth_verify_token]
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+from flask import Flask, render_template, request, jsonify, redirect, url_for, send_from_directory
 from google.auth.transport import requests
 from google.cloud import datastore
 import google.oauth2.id_token
@@ -95,6 +95,10 @@ def index():
         'index.html',
         user_data=claims, error_message=error_message)
 # [END gae_python37_auth_verify_token]
+
+@app.route('/webfonts/<path:path>')
+def send_webfonts(path):
+    return send_from_directory('static/webfonts', path)
 
 @app.route("/browse/", defaults={"page": 0, "length": 100})
 @app.route("/browse/<int:page>/", defaults={"length": 100})

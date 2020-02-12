@@ -42,6 +42,7 @@
         integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome.css') }}">
 
 </head>
 
@@ -50,6 +51,7 @@
     <div class="container-fluid">
         <div class="row">
 
+            <!-- Sections Panel -->
             <div id="sections" class="col-4">
                 <div id="header">
                     <button id="map-sections-btn" class="btn btn-primary float-right">Map</button>
@@ -62,15 +64,22 @@
                 </div>
                 <div id="section-list"></div>
             </div>
+            <!-- END Sections Panel -->
 
+            <!-- Locations Panel -->
             <div id="locations" class="col-4" style="display:none">
                 <div id="header">
-                    <button id="back-to-sections-btn" class="btn btn-primary float-right">Back</button>
+                    <div class="float-right">
+                        <button id="article-weight-btn" class="btn btn-warning active">Article Weight</button>
+                        <button id="back-to-sections-btn" class="btn btn-primary">Back</button>
+                    </div>
                     <h5>Locations</h5>
                 </div>
                 <div id="location-list"></div>
             </div>
+            <!-- END Locations Panel -->
 
+            <!-- Articles / Headlines Panel -->
             <div id="headlines" class="col-5" style="display:none">
                 <div id="header">
                     <button id="back-to-locations-btn" class="btn btn-primary float-right">Back</button>
@@ -78,12 +87,18 @@
                 </div>
                 <div id="headline-list"></div>
             </div>
+            <!-- END Articles / Headlines Panel -->
 
+            <!-- Article Panel -->
             <div id="article" class="col-7" style="display:none"></div>
+            <!-- END Article Panel -->
 
+            <!-- Map Container -->
             <div id="mapContainer" class="col">
                 <div id="map"></div>
             </div>
+            <!-- END Map Container -->
+
         </div>
     </div>
 
@@ -95,12 +110,14 @@
         var map;
         var heatmapLayer;
         var heatMapData;
+        var marker;
+        var hampton_roads;
 
         function initMap() {
 
             heatMapData = new google.maps.MVCArray([]);
-
-            var hampton_roads = new google.maps.LatLng(36.6, -76.3637);
+            marker = new google.maps.Marker();
+            hampton_roads = new google.maps.LatLng(36.6, -76.3637);
 
             map = new google.maps.Map(document.getElementById('map'), {
                 center: hampton_roads,
@@ -134,6 +151,16 @@
             return sections;
         }
 
+        var cities = [
+            'hampton roads',
+            'norfolk',
+            'virginia beach',
+            'portsmouth',
+            'chesapeake',
+            'suffolk',
+            'newport news',
+            'hampton'
+        ];
         function getLocations() {
             $('#location-list').html('Loading...');
 
@@ -147,23 +174,78 @@
                 locations.forEach(location => {
                     var locationHtml = '<div class="location-name">' + location.location.address + '</div>';
                     var articleCountHtml = '<div class="text-muted small mb-1">' + location.article_count + ' articles</div>';
-                    $('#location-list').append('<div class="row"><div class="col">' + locationHtml +  articleCountHtml + '</div></div>');
-
-                    if (location.location.lat > 36.5 && 
-                        location.location.lat < 37.2 && 
-                        location.location.lng > -77 && 
-                        location.location.lng < -75.5)
-                    {
-                        heatMapData.push({
-                            "location": new google.maps.LatLng(location.location.lat, location.location.lng),
-                            "weight": location.article_count
-                        });
-                    }
+                    var locationButtons = '<div class="float-right">';
+                        if(cities.indexOf(location.location.address.toLowerCase()) === -1)
+                            locationButtons += '<button class="toggle-map btn btn-light btn-sm mr-1"><i class="fas fa-minus-circle"></i></button>';
+                        else
+                            locationButtons += '<button class="toggle-map btn btn-dark btn-sm mr-1"><i class="fas fa-minus-circle"></i></button>';
+                        locationButtons += '<button class="toggle-marker btn btn-primary btn-sm mr-1"><i class="fas fa-map-marker"></i></button>';
+                        locationButtons += '<button class="show-articles btn btn-primary btn-sm mr-1"><i class="fas fa-arrow-right"></i></button>';
+                        locationButtons += '</div>';
+                    var data = 'data-location="' + location.location.address + '"';
+                        data += 'data-lat="' + location.location.lat + '"';
+                        data += 'data-lng="' + location.location.lng + '"';
+                        data += 'data-articles="' + location.article_count + '"';
+                    $('#location-list').append('<div class="row"><div class="col" ' + data + '>' + locationButtons + locationHtml +  articleCountHtml + '</div></div>');
                 });
-                $('#location-list .location-name').click(function() {
-                    getLocationHeadlines($(this).html());
-                })
+
+                $('#location-list .toggle-map').click(function() {
+                    $(this).toggleClass('btn-light');
+                    $(this).toggleClass('btn-dark');
+                    drawHeatmap();
+                });
+                
+                $('#location-list .show-articles').click(function() {
+                    var location = $(this).parent().parent().data('location');
+                    getLocationHeadlines(location);
+                });
+
+                $('#location-list .toggle-marker').click(drawMarker);
+
+                drawHeatmap();
             });
+        }
+
+        function drawHeatmap() {
+            heatMapData.clear();
+            $('#location-list .toggle-map.btn-light').each(function() {
+                var lat = $(this).parent().parent().data('lat');
+                var lng = $(this).parent().parent().data('lng');
+                var articles = $(this).parent().parent().data('articles');
+                var weightArticles = $('#article-weight-btn').hasClass('active');
+
+                if (lat > 36.5 && 
+                    lat < 37.2 && 
+                    lng > -77 && 
+                    lng < -75.5)
+                {
+                    heatMapData.push({
+                        "location": new google.maps.LatLng(lat, lng),
+                        "weight": weightArticles ? articles : 1
+                    });
+                }
+            });
+        }
+
+        function drawMarker() {
+            var lat = $(this).parent().parent().data('lat');
+            var lng = $(this).parent().parent().data('lng');
+            var location = $(this).parent().parent().data('location');
+            var bounds = new google.maps.LatLngBounds();
+            bounds.extend(hampton_roads);
+
+            if (marker.getTitle() === location) {
+                marker.setMap(null);
+                marker.setTitle(null);
+                map.setCenter(hampton_roads);
+                map.setZoom(9);
+            } else {
+                marker.setPosition({lat: lat, lng: lng});
+                marker.setTitle(location);
+                marker.setMap(map);
+                bounds.extend(marker.getPosition());
+                map.fitBounds(bounds);
+            }
         }
 
         function getLocationHeadlines(locationName) {
@@ -225,6 +307,13 @@
             $('#back-to-locations-btn').click(function() {
                 $('#headlines').hide();
                 $('#locations').show();
+            });
+
+            $('#article-weight-btn').click(function() {
+                $(this).toggleClass('active');
+                $(this).toggleClass('btn-light');
+                $(this).toggleClass('btn-warning');
+                drawHeatmap();
             });
         });
     </script>
