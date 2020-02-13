@@ -148,7 +148,6 @@ def map_postal_codes(city):
 def get_locations():
     sections = request.get_json(force=True)
     return jsonify(db.get_locations_for_sections(sections))
-    
 
 @app.route('/api/location/<path:location>', methods=['POST'])
 def get_articles_for_location(location): 

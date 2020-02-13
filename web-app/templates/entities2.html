@@ -151,6 +151,13 @@
             return sections;
         }
 
+        function isInHamptonRoads(lat, lng) {
+            return lat > 36.5 &&  
+                   lat < 37.2 && 
+                   lng > -77 &&  
+                   lng < -75.5;
+        }
+
         var cities = [
             'hampton roads',
             'norfolk',
@@ -161,6 +168,7 @@
             'newport news',
             'hampton'
         ];
+
         function getLocations() {
             $('#location-list').html('Loading...');
 
@@ -175,10 +183,16 @@
                     var locationHtml = '<div class="location-name">' + location.location.address + '</div>';
                     var articleCountHtml = '<div class="text-muted small mb-1">' + location.article_count + ' articles</div>';
                     var locationButtons = '<div class="float-right">';
-                        if(cities.indexOf(location.location.address.toLowerCase()) === -1)
-                            locationButtons += '<button class="toggle-map btn btn-light btn-sm mr-1"><i class="fas fa-minus-circle"></i></button>';
-                        else
-                            locationButtons += '<button class="toggle-map btn btn-dark btn-sm mr-1"><i class="fas fa-minus-circle"></i></button>';
+                    
+                    if(isInHamptonRoads(location.location.lat, location.location.lng)) {
+                        var isCity = cities.indexOf(location.location.address.toLowerCase()) !== -1;
+
+                        locationButtons += '<span class="badge badge-success mr-3">Hampton Roads</span>';
+                        locationButtons += '<button class="toggle-map btn btn-sm mr-1 ';
+                        locationButtons += isCity ? 'btn-light' : 'btn-dark';
+                        locationButtons += '"><i class="fas fa-fire"></i></button>';
+                    }
+                    
                         locationButtons += '<button class="toggle-marker btn btn-primary btn-sm mr-1"><i class="fas fa-map-marker"></i></button>';
                         locationButtons += '<button class="show-articles btn btn-primary btn-sm mr-1"><i class="fas fa-arrow-right"></i></button>';
                         locationButtons += '</div>';
@@ -208,22 +222,16 @@
 
         function drawHeatmap() {
             heatMapData.clear();
-            $('#location-list .toggle-map.btn-light').each(function() {
+            $('#location-list .toggle-map.btn-dark').each(function() {
                 var lat = $(this).parent().parent().data('lat');
                 var lng = $(this).parent().parent().data('lng');
                 var articles = $(this).parent().parent().data('articles');
                 var weightArticles = $('#article-weight-btn').hasClass('active');
 
-                if (lat > 36.5 && 
-                    lat < 37.2 && 
-                    lng > -77 && 
-                    lng < -75.5)
-                {
-                    heatMapData.push({
-                        "location": new google.maps.LatLng(lat, lng),
-                        "weight": weightArticles ? articles : 1
-                    });
-                }
+                heatMapData.push({
+                    "location": new google.maps.LatLng(lat, lng),
+                    "weight": weightArticles ? articles : 1
+                });
             });
         }
 
