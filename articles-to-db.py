@@ -46,7 +46,7 @@ def get_p_text(tag_name):
         if p_tag_text == "This is a developing story. Check back at PilotOnline.com for details.":
             continue
         body += p_tag_text + "\n"
-    return body
+    return cleanhtml(body)
 
 # Get all web sections under pubdata tag
 # Returns list of strings
