@@ -12,6 +12,15 @@ for article in articles:
 
 entity_count = 0
 
+convert = {
+    "NORFOLK": "Norfolk",
+    "PORTSMOUTH": "Portsmouth",
+    "VIRGINIA BEACH": "Virginia Beach",
+    "SUFFOLK": "Suffolk",
+    "HAMPTON": "Hampton",
+    "NEWPORT NEWS": "Newport News"
+}
+
 bad_files = []
 
 # Open csv files which reflect database tables
@@ -40,9 +49,14 @@ with open('nlentities.csv', 'w',  newline='') as nlentities_csvfile:
                 for entity in entities:
                     if entity['type'] == 'NUMBER':
                         continue
-                    
+
                     entity_count += 1
 
+                    name = entity['name']
+                    if name in convert:
+                        name = convert[name]
+                        print("Converted ", entity['name'], " to ", name)
+                        
                     wiki = None
                     if 'metadata' in entity and 'wikipedia_url' in entity['metadata']:
                         wiki = entity['metadata']['wikipedia_url'].encode("ascii", errors="ignore").decode()
@@ -59,7 +73,7 @@ with open('nlentities.csv', 'w',  newline='') as nlentities_csvfile:
 
                     nlentity_writer.writerow([
                         entity_count,
-                        entity['name'],
+                        name,
                         entity['type'],
                         wiki,
                         salience,
