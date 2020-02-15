@@ -41,3 +41,4 @@ The following env vars are required:
 * PG_CLIENT_CERT
 * PG_SERVER_CA
 * GOOGLE_APPLICATION_CREDENTIALS
+* MAPBOX_KEY
