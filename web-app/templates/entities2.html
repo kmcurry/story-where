@@ -316,14 +316,28 @@
 
                     article.nl_entities.forEach(entity => {
                         var list = "";
-                        if (entity.location)
+                        if (entity.location) {
                             list = "#article-locations-list";
-                        else
+                        } else {
                             list = "#article-entities-list";
-                        $(list).append("<div>" + entity.name +
-                            "</div><div class=\"text-muted small mb-1\">" + entity.type + " - " + (
-                                entity.salience.toString().substring(0, 5)) + "</div>");
+                        }
+                        var html = '<div>';
+                        if (entity.location) {
+                            var data = 'data-location="' + entity.location.address + '"';
+                                data += 'data-lat="' + entity.location.lat + '"';
+                                data += 'data-lng="' + entity.location.lng + '"';
+                            html = '<div ' + data + '>';
+                            html += '<div class="float-right">';
+                            html += '<button class="toggle-marker btn btn-primary btn-sm mr-1"><i class="fas fa-map-marker"></i></button>';
+                            html += '</div>';
+                        }
+                            html += '<div>' + entity.name + '</div>';
+                            html += '<div class="text-muted small mb-1">' + entity.type + ' - ' + (entity.salience.toString().substring(0, 5)) + '</div>';
+                            html += '</div>';
+                        $(list).append(html);
                     });
+
+                    $('#article-locations-list .toggle-marker').click(drawMarker);
                 });
         }
 
