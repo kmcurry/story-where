@@ -134,7 +134,7 @@ def map_section(section):
 @app.route('/postal-codes/', defaults={"city": "Norfolk"})
 @app.route('/postal-codes/<string:city>/')
 def map_postal_codes(city):
-    key = 'pk.eyJ1Ijoia21jdXJyeSIsImEiOiJjanJlNXE2NzMweWk1M3lscHQ5dTJ6MmU3In0.GrB9Ngw2dm4HewnoFI5rKA' # os.environ['MAPBOX_KEY']
+    key = os.environ['MAPBOX_KEY']
     print(key)
     return render_template(
         'postal_codes.html',
