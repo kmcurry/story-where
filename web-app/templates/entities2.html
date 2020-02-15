@@ -267,7 +267,7 @@
                 console.log(articles);
                 $('#headline-list').html('');
                 articles.forEach(article => {
-                    $('#headline-list').append('<div class="headline">' + article.headline + '</div>')
+                    $('#headline-list').append('<div class="headline" data-id="' + article.id + '">' + article.headline + '</div>')
                 });
             });
         }
