@@ -203,6 +203,9 @@ class Database():
             .distinct(NLEntity.name) \
             .filter(NLEntity.proper, NLEntity.salience >= 0.01, NLEntity.type.in_( ("ORGANIZATION", "LOCATION") )) \
             .all()
+    
+    def get_article_by_doc_id(self, docId):
+        return self.session.query(Article).filter(Article.doc_id == docId).one_or_none()
 
 class WebDatabase():
     def __init__(self):

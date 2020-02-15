@@ -55,8 +55,8 @@ with open('nlentities.csv', 'w',  newline='') as nlentities_csvfile:
                     name = entity['name']
                     if name in convert:
                         name = convert[name]
-                        print("Converted ", entity['name'], " to ", name)
-                        
+                        print("Converted", entity['name'], "to", name)
+
                     wiki = None
                     if 'metadata' in entity and 'wikipedia_url' in entity['metadata']:
                         wiki = entity['metadata']['wikipedia_url'].encode("ascii", errors="ignore").decode()
