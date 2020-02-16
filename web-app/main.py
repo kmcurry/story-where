@@ -119,7 +119,7 @@ def map_entities():
         'entities.html',
         sections=sections)
 
-@app.route('/map2/')
+@app.route('/heat-map/')
 def map_entities2():
     return render_template('entities2.html')
 
