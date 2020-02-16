@@ -1,5 +1,6 @@
 <!doctype html>
 <html>
+
 <head>
   <title>Story Where</title>
 
@@ -30,22 +31,23 @@
 
   <script>
     var getUrlParameter = function getUrlParameter(sParam) {
-        var sPageURL = window.location.search.substring(1),
-            sURLVariables = sPageURL.split('&'),
-            sParameterName,
-            i;
+      var sPageURL = window.location.search.substring(1),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
 
-        for (i = 0; i < sURLVariables.length; i++) {
-            sParameterName = sURLVariables[i].split('=');
+      for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
 
-            if (sParameterName[0] === sParam) {
-                return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
-            }
+        if (sParameterName[0] === sParam) {
+          return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
         }
+      }
     };
 
     if (typeof firebase === 'undefined') {
-      const msg = "Please paste the Firebase initialization snippet into index.html. See https://console.firebase.google.com > Overview > Add Firebase to your web app.";
+      const msg =
+        "Please paste the Firebase initialization snippet into index.html. See https://console.firebase.google.com > Overview > Add Firebase to your web app.";
       console.log(msg);
       alert(msg);
     } else {
@@ -64,31 +66,59 @@
   <script src="{{ url_for('static', filename='auth.js') }}"></script>
   <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+
 </head>
+
 <body style="text-align: center;">
 
-<!-- [START gae_python37_auth_firebase_html] -->
-<h1>Story Where Login</h1>
+  <!-- [START gae_python37_auth_firebase_html] -->
+  <h1>Story Where</h1>
 
-<div id="firebaseui-auth-container"></div>
+  <div id="firebaseui-auth-container"></div>
 
-<button id="sign-out" hidden=true>Sign Out</button>
+  <button id="sign-out" hidden=true>Sign Out</button>
 
-<div id="login-info" hidden=true>
-  <h2>Login info:</h2>
-  {% if user_data %}
+  <div id="login-info" hidden=true>
+    <h2>Login info:</h2>
+    {% if user_data %}
     <dl>
-      <dt>Name</dt><dd>{{ user_data['name'] }}</dd>
-      <dt>Email</dt><dd>{{ user_data['email'] }}</dd>
+      <dt>Name</dt>
+      <dd>{{ user_data['name'] }}</dd>
+      <dt>Email</dt>
+      <dd>{{ user_data['email'] }}</dd>
     </dl>
 
-    <h2><a href="/map">Map</a></h2>
-    <h2><a href="/map2">Map2</a></h2>
-    <h2><a href="/postal-codes">Postal Codes</a></h2>
-  {% elif error_message %}
+    <h2>Pages</h2>
+    <!-- <h3><a href="/map">Map</a></h3> -->
+    <h3><a href="/heat-map">Heat Map</a></h3>
+    <h3><a href="/postal-codes">Postal Codes</a></h3>
+
+    <h2>API Endpoints</h2>
+    <h3>Get</h3>
+    <p><a href="api/article/1">api/article/[int:article_id]</a></p>
+    <p><a href="api/entities">api/entities</a></p>
+    <p><a href="api/entities/1">api/entities/[int:page]</a></p>
+    <p><a href="api/entities/0/500">api/entities/[int:page]/[int:length]</a></p>
+    <p><a href="api/headlines">api/headlines</a></p>
+    <p><a href="api/headlines/1">api/headlines/[int:page]</a></p>
+    <p><a href="api/headlines/0/500">api/headlines/[int:page]/[int:length]</a></p>
+    <p><a href="api/info">api/info</a></p>
+    <p><a href="api/info/0.5">api/info/[float:salience]</a></p>
+    <p><a href="api/postal-codes">api/postal-codes</a></p>
+    <p><a href="api/postal-codes/Portsmouth">api/postal-codes/[string:city]</a></p>
+    <p><a href="api/sections">api/sections</a></p>
+    <p><a href="api/sub-city-locations">api/sub-city-locations</a></p>
+    <p><a href="api/sub-city-locations/Portsmouth">api/sub-city-locations/[string:city]</a></p>
+    <h3>Post</h3>
+    <p><a href="api/locations">api/locations</a></p>
+    {% elif error_message %}
     <p>Error: {{ error_message }}</p>
-  {% endif %}
-</div>
-<!-- [END gae_python37_auth_firebase_html] -->
+    {% endif %}
+  </div>
+  <!-- [END gae_python37_auth_firebase_html] -->
 </body>
+
 </html>
