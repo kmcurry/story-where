@@ -142,22 +142,26 @@ def map_postal_codes(city):
         mapbox_key=key)
 
 
-#vv########################### API endpoints by alpha ################################
+############################ API endpoints by alpha ################################
 
+# Returns all Locations for given array of Sections
 @app.route('/api/locations', methods=['POST'])
 def get_locations():
     sections = request.get_json(force=True)
     return jsonify(db.get_locations_for_sections(sections))
 
+# Returns all Articles for given Location and array of Sections
 @app.route('/api/location/<path:location>', methods=['POST'])
 def get_articles_for_location(location): 
     sections = request.get_json(force=True)
     return jsonify(db.get_articles_for_entity(sections, location))
 
+# Returns the Article with the given ID
 @app.route('/api/article/<int:article_id>')
 def get_article(article_id): 
     return jsonify(db.get_article(article_id))
 
+# Returns Entities for the given combination of page and length, defaults are page=0&length=100
 @app.route("/api/entities/", defaults={"page": 0, "length": 100})
 @app.route("/api/entities/<int:page>", defaults={"length": 100})
 @app.route('/api/entities/<int:page>/<int:length>')
@@ -165,6 +169,7 @@ def get_entities(page, length):
     entities = db.get_entities(page, length)
     return jsonify(entities)
 
+# Returns Headlines for the given combination of page and length, defaults are page=0&length=100
 @app.route("/api/headlines/", defaults={"page": 0, "length": 100})
 @app.route("/api/headlines/<int:page>/", defaults={"length": 100})
 @app.route('/api/headlines/<int:page>/<int:length>')
@@ -172,24 +177,28 @@ def get_headlines(page, length):
     headlines = db.get_headlines(page, length)
     return jsonify(headlines)
 
+# Returns the count of distinct Proper Locations and distinct Proper Organizations given the minimum salience, default salience=0.1
 @app.route("/api/info/", defaults={"salience": 0.1})
 @app.route("/api/info/<float:salience>")
 def get_info(salience):
     info = db.get_info(salience)
     return jsonify(info)
 
+# Returns the count of articles by postal code for the given city, default city=Norfolk
 @app.route("/api/postal-codes/", defaults={"city": "Norfolk"})
 @app.route("/api/postal-codes/<string:city>")
 def get_count_of_articles_by_postal_code(city):
     data = db.get_count_of_articles_by_postal_code(city)
     return jsonify(data)
 
+# Returns Proper Locations within a given city, default city=Norfolk
 @app.route("/api/sub-city-locations/", defaults={"cities": "Norfolk"})
 @app.route("/api/sub-city-locations/<path:cities>")
 def get_locations_within_cities(cities):
     data = db.get_locations_within_cities(cities.split('/'))
     return jsonify(data)
 
+# Returns Proper Locations having the given minimum salience, length Locations per page, defaults are salience=0.1&page=0&length=100
 @app.route("/api/proper-locations/", defaults={"salience": 0.1, "page": 0, "length": 100})
 @app.route("/api/proper-locations/<float:salience>", defaults={"page": 0, "length": 100})
 @app.route("/api/proper-locations/<float:salience>/<int:page>/", defaults={"length": 100})
@@ -198,6 +207,7 @@ def get_proper_locations(salience, page, length):
     proper_locations = db.get_proper_locations(salience, page, length)
     return jsonify(proper_locations)
 
+# Returns Proper Organizations having the given minimum salience, length Organizations per page, defaults are salience=0.1&page=0&length=100
 @app.route("/api/proper-organizations/", defaults={"salience": 0.1, "page": 0, "length": 100})
 @app.route("/api/proper-organizations/<float:salience>", defaults={"page": 0, "length": 100})
 @app.route("/api/proper-organizations/<float:salience>/<int:page>/", defaults={"length": 100})
@@ -206,12 +216,13 @@ def get_proper_organizations(salience, page, length):
     proper_organizations = db.get_proper_organizations(salience, page, length)
     return jsonify(proper_organizations)
 
+# Returns an array of sections of the Publication
 @app.route("/api/sections")
 def get_sections():
     sections = db.get_sections()
     return jsonify(sections)
 
-#vv########################### MAIN ################################
+############################ MAIN ################################
 
 if __name__ == '__main__':
     # This is used when running locally only. When deploying to Google App
