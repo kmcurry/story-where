@@ -44,7 +44,8 @@ allowed_emails = [
     'e.smith@pilotonline.com',
     'jheeter@pilotonline.com',
     'sean.kennedy@pilotonline.com',
-    'brian.colligan@pilotonline.com'
+    'brian.colligan@pilotonline.com',
+    'kworrell@virginiamedia.com'
 ]
 
 @app.before_request
