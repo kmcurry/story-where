@@ -77,7 +77,7 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=\
     id: 'mapbox.light'
 }).addTo(map);
 
-var legend = L.control({position: 'bottomright'});
+var legend = L.control({position: 'topright'});
 
 legend.onAdd = function (map) {
 

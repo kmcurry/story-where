@@ -111,6 +111,9 @@ def browse(page, length):
         headlines=h, 
         error_message=error_message)
 
+@app.route('/graph/')
+def graph_entities():
+    return render_template('graph_entities.html')
 
 @app.route('/map/')
 def map_entities():
@@ -121,7 +124,7 @@ def map_entities():
 
 @app.route('/heat-map/')
 def map_entities2():
-    return render_template('entities2.html')
+    return render_template('map_entities.html')
 
 @app.route('/map/<path:section>')
 def map_section(section):
@@ -137,7 +140,7 @@ def map_postal_codes(city):
     key = os.environ['MAPBOX_KEY']
     print(key)
     return render_template(
-        'postal_codes.html',
+        'map_postal_codes.html',
         city=city,
         mapbox_key=key)
 

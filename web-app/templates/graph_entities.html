@@ -1,0 +1,120 @@
+<!doctype html>
+<html>
+
+    <head>
+        <title>Entity Graph</title>
+        <meta name="viewport" content="initial-scale=1.0">
+        <meta charset="utf-8">
+
+    <style>
+        /* Elements */
+        td {
+            padding: 6px;
+        }
+        
+        /* Classes */
+
+        .legend {
+            line-height: 18px;
+            color: #555;
+        }
+
+        .legend i {
+            width: 18px;
+            height: 18px;
+            float: left;
+            margin-right: 8px;
+            opacity: 0.7;
+        }
+
+        /* IDs */
+
+        #graph {
+            height: 100%;
+            background-color:#bfcde2;
+        }
+
+        #graphContainer {
+            height: 800px;
+            position: -webkit-sticky; /* Safari */
+            position: sticky;
+            top: 0px;
+        }
+
+        /* Devices */
+        @media only screen 
+        and (min-device-width: 320px) 
+        and (max-device-width: 480px)
+        and (-webkit-min-device-pixel-ratio: 2) {
+            .p-md {
+                font-size: 40px !important;
+            }
+        }
+        
+            /* Portrait */
+        @media only screen 
+        and (min-device-width: 320px) 
+        and (max-device-width: 480px)
+        and (-webkit-min-device-pixel-ratio: 2)
+        and (orientation: portrait) {
+            body {
+                font-size: 40px !important;
+            }
+            .container {
+                margin: 4px !important;
+                padding: 4px !important;
+            }
+            .tr {
+                font-size: 40px !important;
+            }
+        
+        }
+    </style>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+    
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+    
+    <div class="row">
+        <div id="entities" class="col-2">
+            <div id="listTitle">
+                <h2>Entity Graph</h2>
+            </div>
+            <ol id="entitiesList"></ol>
+        </div>
+
+        <div id="graphContainer" class="col-10">
+            <div id="graph">
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+    <script>
+
+        $(document).ready( function() {
+            initGraph();
+            //loadArticleCounts(city);
+        } );
+    </script>
+
+    <script src="https://d3js.org/d3.v3.min.js"></script>
+    <script src="https://d3js.org/d3-dispatch.v1.min.js"></script>
+    <script src="https://d3js.org/d3-quadtree.v1.min.js"></script>
+    <script src="https://d3js.org/d3-timer.v1.min.js"></script>
+    <script src="https://d3js.org/d3-force.v2.min.js"></script>
+    <script src="/static/graph_entities.js"></script>
+    
+
+</body>
+
+</html>
