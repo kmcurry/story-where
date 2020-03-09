@@ -25,6 +25,8 @@ import google.oauth2.id_token
 
 from db import WebDatabase
 
+logger = logging.getLogger('scope.name')
+
 #logging.basicConfig()
 #logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
@@ -36,17 +38,6 @@ firebase_request_adapter = requests.Request()
 datastore_client = datastore.Client()
 
 app = Flask(__name__)
-
-allowed_emails = [
-    'ben.schoenfeld@gmail.com',
-    'kmcurry@gmail.com',
-    'ericasmith13@gmail.com',
-    'e.smith@pilotonline.com',
-    'jheeter@pilotonline.com',
-    'sean.kennedy@pilotonline.com',
-    'brian.colligan@pilotonline.com',
-    'kworrell@virginiamedia.com'
-]
 
 @app.before_request
 def before_request():
@@ -62,8 +53,9 @@ def before_request():
     try:
         claims = google.oauth2.id_token.verify_firebase_token(
             id_token, firebase_request_adapter)
-        if claims['email'] not in allowed_emails:
-            return jsonify({'error': "User not allowed"})
+        logger.info(claims['email'])
+        # if claims['email'] not in allowed_emails:
+        #     return jsonify({'error': "User not allowed"})
     except ValueError as exc:
         error_message = str(exc)
         return jsonify({'error': error_message})
@@ -139,7 +131,6 @@ def map_section(section):
 @app.route('/postal-codes/<string:city>/')
 def map_postal_codes(city):
     key = os.environ['MAPBOX_KEY']
-    print(key)
     return render_template(
         'map_postal_codes.html',
         city=city,
